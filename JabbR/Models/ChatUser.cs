@@ -33,6 +33,7 @@ namespace JabbR.Models
         public string Flag { get; set; }
 
         public string Identity { get; set; }
+        public string EmployeeId { get; set; }
 
         public string Email { get; set; }
 

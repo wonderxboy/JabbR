@@ -11,8 +11,10 @@ namespace JabbR.ContentProviders
         {
             string url = request.RequestUri.ToString();
             return TaskAsyncHelper.FromResult(new ContentProviderResult()
-             {
-                 Content = String.Format(@"<img src=""proxy?url={0}"" />", Encoder.HtmlAttributeEncode(url)),
+            {
+                // No need for proxies! PROXY MUYO!
+                 //Content = String.Format(@"<img src=""proxy?url={0}"" />", Encoder.HtmlAttributeEncode(url)),
+                Content = String.Format(@"<img src=""{0}"" />", Encoder.HtmlAttributeEncode(url)),
                  Title = url
              });
         }

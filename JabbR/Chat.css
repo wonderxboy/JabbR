@@ -188,9 +188,10 @@
 
     .messages li img.gravatar
     {
-      height: 16px;
-      width: 16px;
+      height: auto;
+      width: auto;
       display: inline-block;
+      vertical-align: middle;
     }
 
 .roomTopic
@@ -246,7 +247,7 @@
 
   .users li.room.closed .name
   {
-	margin-left: 23px;
+    margin-left: 23px;
   }
 
   .users li.room.locked .name
@@ -571,7 +572,7 @@ li.room
 
 .notification
 {
-  color: #bbb;
+  color: #999;
   border-bottom: 1px solid #eee;
   padding: 5px;
 }
@@ -597,6 +598,11 @@ li.room
   {
     opacity: 0.4;
   }
+
+.memsg
+{
+  color: #f0f;
+}
 
 .message
 {
@@ -669,6 +675,14 @@ li.room
 .highlight
 {
   background-color: #fff6bd;
+}
+
+.greentext
+{
+  color: #789922;
+  font-family: 'Arial', Sans-Serif;
+  font-weight: normal;
+  font-size: 12px;
 }
 
 .list-header

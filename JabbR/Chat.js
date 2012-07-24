@@ -119,12 +119,14 @@
             country: user.Country,
             lastActive: lastActive,
             timeAgo: $.timeago(lastActive),
-            admin: user.IsAdmin
+            admin: user.IsAdmin,
+            user: user.EmployeeId
         };
     }
 
     function getMessageViewModel(message) {
         var re = new RegExp("\\b@?" + chat.name.replace(/\./, '\\.') + "\\b", "i");
+        var regt = new RegExp("^&gt;");
         return {
             name: message.User.Name,
             hash: message.User.Hash,
@@ -132,7 +134,9 @@
             id: message.Id,
             date: message.When.fromJsonDate(),
             highlight: re.test(message.Content) ? 'highlight' : '',
-            isOwn: re.test(message.User.name)
+            greentext: regt.test(message.Content) ? 'greentext' : '',
+            isOwn: re.test(message.User.name),
+            employeeId: message.User.EmployeeId
         };
     }
 
@@ -569,7 +573,7 @@
     };
 
     chat.sendMeMessage = function (name, message, room) {
-        ui.addMessage('*' + name + ' ' + message, 'notification', room);
+        ui.addMessage('*' + name + ' ' + message, 'notification memsg', room);
     };
 
     chat.sendPrivateMessage = function (from, to, message) {
@@ -936,7 +940,11 @@
                         }
                         else {
                             ui.addMessage('Use /nick user password to log in with jabbr', 'notification');
-                            ui.addMessage('To enable janrain login, setup the missing values in web.config', 'notification');
+                            //ui.addMessage('To enable janrain login, setup the missing values in web.config', 'notification');
+
+                            // join hotglue, sucka!
+                            $('#new-message').val('/join hotglue');
+                            triggerSend();
                         }
                     }
                     // get list of available commands

@@ -11,6 +11,8 @@
 <html>
 <head>
     <title>JabbR</title>
+    <link rel="icon" type="image/png" href="<%= Page.ResolveUrl("~/Content/favicon.ico") %>" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta name="description" content="A real-time chat application. IRC without the R." />
     <meta name="keywords" content="chat,realtime chat,signalr,jabbr" />
@@ -76,11 +78,12 @@
 
     </script>
     <% } %>
+    <!--<img src="https://secure.gravatar.com/avatar/${hash}?s=16&d=mm" class="gravatar" />-->
     <script id="new-message-template" type="text/x-jquery-tmpl">
-        <li class="message ${highlight} clearfix" id="m-${id}" data-name="${name}" data-timestamp="${date}">
+        <li class="message ${highlight} ${greentext} clearfix" id="m-${id}" data-name="${name}" data-timestamp="${date}">
             <div class="left">
                 {{if showUser}}
-                <img src="https://secure.gravatar.com/avatar/${hash}?s=16&d=mm" class="gravatar" />
+                <img src="GetUserImage.aspx?id=${employeeId}" class="gravatar" />
                 <span class="name">${trimmedName}</span>
                 {{/if}}
                 <span class="state"></span>
@@ -110,7 +113,7 @@
     </script>
     <script id="new-user-template" type="text/x-jquery-tmpl">
         <li class="user" data-name="${name}">
-            <img class="gravatar" src="https://secure.gravatar.com/avatar/${hash}?s=16&d=mm" />
+            <img class="gravatar" src="GetUserImage.aspx?id=${employeeId}" />
             <div class="details">
                 <span class="name">${name}</span>
                 <span class="admin">{{if admin}}(admin){{/if}}</span>
@@ -201,8 +204,6 @@
           Powered by <a href="https://github.com/SignalR/SignalR" target="_blank">SignalR</a>
         </div>
       </div>
-      <a href="https://github.com/davidfowl/JabbR" class="forkme" target="_blank">
-        </a>
           <div style="clear: both">
     </div>
     <nav>

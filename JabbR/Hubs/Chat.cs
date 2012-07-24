@@ -13,6 +13,7 @@ using JabbR.Services;
 using JabbR.ViewModels;
 using Newtonsoft.Json;
 using SignalR.Hubs;
+using System.Security.Principal;
 
 namespace JabbR
 {
@@ -71,7 +72,25 @@ namespace JabbR
             // Threre's no user being tracked
             if (user == null)
             {
-                return false;
+                try
+                {
+                    // Create them a user account using default Windows auth
+                    var employee = GetEmployee(clientState.UserId);
+
+                    if (employee.DivisionDistrictIndicator != "C290")
+                        throw new InvalidOperationException("Must be a Computer Services employee to login.");
+
+                    string displayName = (employee == null) ? "anon" : employee.FirstName.Replace(' ', '_');
+
+                    user = _service.AddUser(displayName, clientState.UserId, employee.Email);
+
+                    user.EmployeeId = employee.EmployeeId.ToString();
+                }
+                catch
+                {
+                    return false;
+                }
+
             }
 
             // Migrate all users to use new auth
@@ -998,7 +1017,7 @@ namespace JabbR
 
             if (String.IsNullOrEmpty(jabbrState))
             {
-                clientState = new ClientState();
+                clientState = new ClientState() { UserId = StripNTDomain(Context.User.Identity.Name) };
             }
             else
             {
@@ -1016,6 +1035,39 @@ namespace JabbR
             var cookie = Context.RequestCookies[key];
             string value = cookie != null ? cookie.Value : null;
             return value != null ? HttpUtility.UrlDecode(value) : null;
+        }
+
+        private Employee GetEmployee(string userId)
+        {
+            using (var context = new DirectoryContext())
+            {
+                //var wic = WindowsIdentity.Impersonate(System.IntPtr.Zero);
+
+                var employee = context.Employees.Where(e => e.UserId == userId && e.Enabled).FirstOrDefault();
+
+                //wic.Undo();
+
+                return employee;
+            }
+        }
+
+        private string StripNTDomain(string userName)
+        {
+            if (userName.Contains("\\"))
+            {
+                // Retrieve a substring of only the username portion
+                //(everything after the backslash).
+                return userName.Substring(userName.IndexOf("\\") + 1).ToUpper();
+            }
+            else if (userName.Contains("/"))
+            {
+                // Does the same as the above but for a forward slash.
+                return userName.Substring(userName.IndexOf("/") + 1).ToUpper();
+            }
+            else
+            {
+                return userName;
+            }
         }
     }
 }

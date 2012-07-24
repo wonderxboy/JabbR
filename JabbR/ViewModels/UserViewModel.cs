@@ -19,6 +19,7 @@ namespace JabbR.ViewModels
             Country = ChatService.GetCountry(user.Flag);
             LastActivity = user.LastActivity;
             IsAdmin = user.IsAdmin;
+            EmployeeId = user.EmployeeId;
         }
 
         public string Name { get; private set; }
@@ -32,5 +33,6 @@ namespace JabbR.ViewModels
         public string Country { get; private set; }
         public DateTime LastActivity { get; private set; }
         public bool IsAdmin { get; private set; }
+        public string EmployeeId { get; set; }
     }
 }

@@ -55,7 +55,7 @@ namespace JabbR.App_Start
                 .InRequestScope();
 
             kernel.Bind<IJabbrRepository>()
-                .To<PersistedRepository>()
+                .To<CustomRepository>()
                 .InRequestScope();
 
             kernel.Bind<IChatService>()
@@ -104,7 +104,7 @@ namespace JabbR.App_Start
             RouteTable.Routes.MapHubs(resolver);
 
             // Perform the required migrations
-            DoMigrations();
+            //DoMigrations();
 
             // Start the sweeper
             var repositoryFactory = new Func<IJabbrRepository>(() => kernel.Get<IJabbrRepository>());
