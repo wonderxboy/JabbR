@@ -120,7 +120,7 @@
             lastActive: lastActive,
             timeAgo: $.timeago(lastActive),
             admin: user.IsAdmin,
-            user: user.EmployeeId
+            employeeId: user.EmployeeId
         };
     }
 
