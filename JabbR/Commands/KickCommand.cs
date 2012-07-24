@@ -5,7 +5,7 @@ using JabbR.Models;
 
 namespace JabbR.Commands
 {
-    [Command("kick", "")]
+    [Command("kick", "Type /kick [user] to kick a user from the room. Note, this is only valid for owners of the room.")]
     public class KickCommand : UserCommand
     {
         public override void Execute(CommandContext context, CallerContext callerContext, Models.ChatUser callingUser, string[] args)

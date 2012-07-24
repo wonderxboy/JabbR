@@ -4,7 +4,7 @@ using JabbR.Services;
 
 namespace JabbR.Commands
 {
-    [Command("who", "")]
+    [Command("who", "Type /who to show a list of all users, /who [name] to show specific information about that user")]
     public class WhoCommand : UserCommand
     {
         public override void Execute(CommandContext context, CallerContext callerContext, ChatUser callingUser, string[] args)

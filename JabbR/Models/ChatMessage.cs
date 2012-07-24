@@ -9,6 +9,7 @@ namespace JabbR.Models
         public int Key { get; set; }
 
         public string Content { get; set; }
+        [StringLength(36)]
         public string Id { get; set; }        
         public virtual ChatRoom Room { get; set; }
         public virtual ChatUser User { get; set; }

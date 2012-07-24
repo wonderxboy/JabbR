@@ -8,6 +8,7 @@ namespace JabbR.Models
         [Key]
         public int Key { get; set; }
 
+        [StringLength(36)]
         public string Id { get; set; }
         public ChatUser User { get; set; }
         public string UserAgent { get; set; }

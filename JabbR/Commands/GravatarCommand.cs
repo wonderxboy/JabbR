@@ -5,7 +5,7 @@ using JabbR.Models;
 
 namespace JabbR.Commands
 {
-    [Command("gravatar", "")]
+    [Command("gravatar", "Type /gravatar [email] to set your gravatar.")]
     public class GravatarCommand : UserCommand
     {
         public override void Execute(CommandContext context, CallerContext callerContext, ChatUser callingUser, string[] args)

@@ -4,7 +4,7 @@ using JabbR.Services;
 
 namespace JabbR.Commands
 {
-    [Command("flag", "")]
+    [Command("flag", "Type /flag [Iso 3366-2 Code] - To show a small flag which represents your nationality. Eg. /flag US for a USA flag. ISO Reference Chart: http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2 (Apologies to people with dual citizenship).")]
     public class FlagCommand : UserCommand
     {
         public override void Execute(CommandContext context, CallerContext callerContext, ChatUser callingUser, string[] args)

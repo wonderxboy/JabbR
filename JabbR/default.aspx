@@ -25,7 +25,7 @@
                   "~/Content/KeyTips.css",
                   "~/Content/bootstrap.min.css",
                   "~/Content/emoji20.css")
-            .ForceRelease()
+            //.ForceRelease()
             .Render("~/Content/JabbR_#.css")
   %>
 
@@ -307,7 +307,7 @@
         "~/Scripts/jquery.KeyTips.js",
         "~/Scripts/jquery-ui-1.8.17.min.js",
         "~/Scripts/jquery.signalR-0.5.2.min.js")
-            .ForceRelease()
+            //.ForceRelease()
             .Render("~/Scripts/JabbR1_#.js")
   %>
   <script type="text/javascript" src='<%= ResolveClientUrl("~/signalr/hubs") %>'></script>
@@ -331,7 +331,7 @@
         "~/Chat.pinnedWindows.js",
         "~/Chat.githubissues.js",
         "~/Chat.js")
-            .ForceRelease()
+            //.ForceRelease()
             .Render("~/Scripts/JabbR2_#.js")
   %>
 </body>

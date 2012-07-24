@@ -4,7 +4,7 @@ using JabbR.Models;
 
 namespace JabbR.Commands
 {
-    [Command("addadmin", "")]
+    [Command("addadmin", "Type /addadmin [user] to grant admin status. Only administrators can use this command.")]
     public class AddAdminCommand : UserCommand
     {
         public override void Execute(CommandContext context, CallerContext callerContext, ChatUser callingUser, string[] args)

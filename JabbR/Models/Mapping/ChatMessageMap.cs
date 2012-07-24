@@ -10,6 +10,9 @@ namespace JabbR.Models.Mapping
             // Primary Key
             this.HasKey(m => m.Key);
 
+            this.Property(m => m.Id)
+                .HasMaxLength(36);
+
             // Properties
             // Table & Column Mappings
             this.ToTable("ChatMessages");

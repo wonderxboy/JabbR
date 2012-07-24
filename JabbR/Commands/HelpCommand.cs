@@ -1,6 +1,6 @@
 ﻿namespace JabbR.Commands
 {
-    [Command("help", "")]
+    [Command("help", "Type /help to show the list of commands")]
     public class HelpCommand : ICommand
     {
         public void Execute(CommandContext context, CallerContext callerContext, string[] args)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.Composition.Hosting;
 using System.Linq;
 using JabbR.Models;
@@ -19,7 +20,7 @@ namespace JabbR.Commands
         private readonly IJabbrRepository _repository;
 
         private static Dictionary<string, ICommand> _commandCache;
-        private static readonly Lazy<IList<ICommand>> _commands = new Lazy<IList<ICommand>>(GetCommands);
+        private static readonly Lazy<List<ICommand>> _commands = new Lazy<List<ICommand>>(GetCommands);
 
         public CommandManager(string clientId,
                               string userId,
@@ -49,6 +50,11 @@ namespace JabbR.Commands
             _repository = repository;
             _cache = cache;
             _notificationService = notificationService;
+        }
+
+        public static ReadOnlyCollection<ICommand> Commands
+        {
+            get { return _commands.Value.AsReadOnly(); }
         }
 
         public bool TryHandleCommand(string command)
@@ -124,7 +130,7 @@ namespace JabbR.Commands
             return _commandCache.TryGetValue(commandName, out command);
         }
 
-        private static IList<ICommand> GetCommands()
+        private static List<ICommand> GetCommands()
         {
             // Use MEF to locate the content providers in this assembly
             var catalog = new AssemblyCatalog(typeof(CommandManager).Assembly);

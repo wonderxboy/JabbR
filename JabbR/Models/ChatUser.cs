@@ -10,12 +10,16 @@ namespace JabbR.Models
         [Key]
         public int Key { get; set; }
 
-        [MaxLength(200)]
+        [StringLength(36)]
         public string Id { get; set; }
+        [StringLength(50)]
         public string Name { get; set; }
         // MD5 email hash for gravatar
+        [StringLength(32)]
         public string Hash { get; set; }
+        [StringLength(256)]
         public string Salt { get; set; }
+        [StringLength(256)]
         public string HashedPassword { get; set; }
         public DateTime LastActivity { get; set; }
         public DateTime? LastNudged { get; set; }
@@ -32,9 +36,12 @@ namespace JabbR.Models
         [StringLength(2)]
         public string Flag { get; set; }
 
+        [StringLength(1000)]
         public string Identity { get; set; }
+        [StringLength(9)]
         public string EmployeeId { get; set; }
 
+        [StringLength(500)]
         public string Email { get; set; }
 
         public bool IsAdmin { get; set; }

@@ -452,6 +452,7 @@
         chat.activeRoom = undefined;
         chat.name = undefined;
         chat.id = undefined;
+        chat.employeeId = undefined;
 
         updateCookie();
 
@@ -781,13 +782,16 @@
             }
 
             // Added the message to the ui first
+            var regt = new RegExp("^>");
             var viewModel = {
                 name: chat.name,
                 hash: chat.hash,
                 message: $('<div/>').text(clientMessage.content).html(),
                 id: clientMessage.id,
                 date: new Date(),
-                highlight: ''
+                highlight: '',
+                greentext: regt.test(clientMessage.content) ? 'greentext' : '',
+                employeeId: chat.employeeId
             };
 
             ui.addChatMessage(viewModel, clientMessage.room);

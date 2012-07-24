@@ -4,7 +4,7 @@ using JabbR.Models;
 
 namespace JabbR.Commands
 {
-    [Command("resetinvitecode", "")]
+    [Command("resetinvitecode", "Type /resetinvitecode - To reset the current invite code. This will render the previous invite code invalid")]
     public class ResetInviteCodeCommand : UserCommand
     {
         public override void Execute(CommandContext context, CallerContext callerContext, Models.ChatUser callingUser, string[] args)

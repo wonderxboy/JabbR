@@ -5,7 +5,7 @@ using JabbR.Services;
 
 namespace JabbR.Commands
 {
-    [Command("topic", "")]
+    [Command("topic", "Type /topic [topic] to set the room topic. Type /topic to clear the room's topic.")]
     public class TopicCommand : UserCommand
     {
         public override void Execute(CommandContext context, CallerContext callerContext, ChatUser callingUser, string[] args)

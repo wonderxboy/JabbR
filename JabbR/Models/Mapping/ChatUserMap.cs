@@ -20,6 +20,9 @@ namespace JabbR.Models.Mapping
             this.Property(u => u.Flag)
                 .HasMaxLength(2);
 
+            this.Property(u => u.EmployeeId)
+                .HasMaxLength(9);
+
             // Table & Column Mappings
             this.ToTable("ChatUsers");
             this.Property(u => u.Key).HasColumnName("Key");
@@ -38,6 +41,7 @@ namespace JabbR.Models.Mapping
             this.Property(u => u.Identity).HasColumnName("Identity");
             this.Property(u => u.Email).HasColumnName("Email");
             this.Property(u => u.IsAdmin).HasColumnName("IsAdmin");
+            this.Property(u => u.EmployeeId).HasColumnName("EmployeeId");
         }
     }
 }

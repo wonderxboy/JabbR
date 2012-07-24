@@ -4,7 +4,7 @@ using JabbR.Models;
 
 namespace JabbR.Commands
 {
-    [Command("invitecode", "")]
+    [Command("invitecode", "Type /invitecode - To show the current invite code")]
     public class InviteCodeCommand : UserCommand
     {
         public override void Execute(CommandContext context, CallerContext callerContext, ChatUser callingUser, string[] args)
