@@ -746,6 +746,23 @@ namespace JabbR
             }
         }
 
+        void INotificationService.DeleteRoom(IEnumerable<ChatUser> users, ChatRoom room)
+        {
+            // notify all members of room that it is now deleted
+            foreach (var user in users)
+            {
+                foreach (var client in user.ConnectedClients)
+                {
+                    var userViewModel = new UserViewModel(user);
+                    Clients[room.Name].leave(userViewModel, room.Name).Wait();
+
+                    Groups.Remove(client.Id, room.Name).Wait();
+
+                    Clients[client.Id].roomDeleted(room.Name);
+                }
+            }
+        }
+
         void INotificationService.UnCloseRoom(IEnumerable<ChatUser> users, ChatRoom room)
         {
             // notify all members of room that it is now re-opened

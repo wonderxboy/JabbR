@@ -846,6 +846,27 @@ namespace JabbR.Services
             _repository.CommitChanges();
         }
 
+        public void DeleteRoom(ChatUser user, ChatRoom targetRoom)
+        {
+            EnsureAdmin(user);
+
+            var roomUsers = targetRoom.Users.ToList();
+
+            foreach (var roomUser in roomUsers)
+            {
+                // Update the cache
+                _cache.RemoveUserInRoom(roomUser, targetRoom);
+
+                // Remove the user from this room
+                _repository.RemoveUserRoom(roomUser, targetRoom);
+            }
+
+            targetRoom.AllowedUsers.Clear();
+            targetRoom.Owners.Clear();
+
+            _repository.Remove(targetRoom);
+        }
+
         public void OpenRoom(ChatUser user, ChatRoom targetRoom)
         {
             EnsureOwnerOrAdmin(user, targetRoom);

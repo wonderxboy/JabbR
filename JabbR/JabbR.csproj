@@ -820,6 +820,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\DeleteCommand.cs" />
     <Compile Include="Commands\WelcomeCommand.cs" />
     <Compile Include="Commands\UpdateCommand.cs" />
     <Compile Include="ContentProviders\SpotifyContentProvider.cs" />

@@ -274,6 +274,15 @@
         }
     };
 
+    chat.roomDeleted = function (room) {
+        populateLobbyRooms();
+        ui.addMessage('Room \'' + room + '\' is now deleted', 'notification', 'lobby');
+
+        if (this.activeRoom === room) {
+            ui.toggleMessageSection(true);
+        }
+    };
+
     chat.roomUnClosed = function (room) {
         populateLobbyRooms();
         ui.addMessage('Room \'' + room + '\' is now open', 'notification', this.activeRoom);
