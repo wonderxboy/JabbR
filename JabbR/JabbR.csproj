@@ -167,6 +167,7 @@
     <Content Include="Content\bootstrap-responsive.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\ponymoticon.css" />
     <Content Include="Content\favicon.ico" />
     <Content Include="Content\emoji20.css" />
     <Content Include="Content\images\ajax-loader.png" />
@@ -687,6 +688,10 @@
     <Content Include="Content\images\lock.png" />
     <Content Include="Content\images\no-typing-white.png" />
     <Content Include="Content\images\no-typing.png" />
+    <Content Include="Content\images\ponymoticon\a.png" />
+    <Content Include="Content\images\ponymoticon\b.png" />
+    <Content Include="Content\images\ponymoticon\c.png" />
+    <Content Include="Content\images\ponymoticon\e.png" />
     <Content Include="Content\images\richness-off.png" />
     <Content Include="Content\images\richness-on.png" />
     <Content Include="Content\images\toast-off.png" />

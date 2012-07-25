@@ -24,7 +24,8 @@
                   "~/Chat.dictionary.css",
                   "~/Content/KeyTips.css",
                   "~/Content/bootstrap.min.css",
-                  "~/Content/emoji20.css")
+                  "~/Content/emoji20.css",
+                  "~/Content/ponymoticon.css")
             //.ForceRelease()
             .Render("~/Content/JabbR_#.css")
   %>
