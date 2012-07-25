@@ -698,6 +698,48 @@
     <Content Include="Content\images\typing.png" />
     <Content Include="Content\images\Clippy.png" />
     <Content Include="Content\images\StopWatch.png" />
+    <Content Include="Content\images\v4c\1ducktart.jpg" />
+    <Content Include="Content\images\v4c\33.png" />
+    <Content Include="Content\images\v4c\a.gif" />
+    <Content Include="Content\images\v4c\aliens.gif" />
+    <Content Include="Content\images\v4c\biogurl.gif" />
+    <Content Include="Content\images\v4c\birdy.gif" />
+    <Content Include="Content\images\v4c\bodywash.png" />
+    <Content Include="Content\images\v4c\cat.gif" />
+    <Content Include="Content\images\v4c\dilbert.gif" />
+    <Content Include="Content\images\v4c\dooktart.png" />
+    <Content Include="Content\images\v4c\dsdasd.png" />
+    <Content Include="Content\images\v4c\duane.gif" />
+    <Content Include="Content\images\v4c\ee.gif" />
+    <Content Include="Content\images\v4c\fantasy.gif" />
+    <Content Include="Content\images\v4c\gp.png" />
+    <Content Include="Content\images\v4c\grove.gif" />
+    <Content Include="Content\images\v4c\heh.png" />
+    <Content Include="Content\images\v4c\jimmy.gif" />
+    <Content Include="Content\images\v4c\keke6.png" />
+    <Content Include="Content\images\v4c\kim.gif" />
+    <Content Include="Content\images\v4c\kray.png" />
+    <Content Include="Content\images\v4c\ll.gif" />
+    <Content Include="Content\images\v4c\o2XNE.jpg" />
+    <Content Include="Content\images\v4c\oz.gif" />
+    <Content Include="Content\images\v4c\pomf.png" />
+    <Content Include="Content\images\v4c\pstriple.png" />
+    <Content Include="Content\images\v4c\push.gif" />
+    <Content Include="Content\images\v4c\ready.gif" />
+    <Content Include="Content\images\v4c\seal.png" />
+    <Content Include="Content\images\v4c\shower.gif" />
+    <Content Include="Content\images\v4c\snoop.gif" />
+    <Content Include="Content\images\v4c\sonicx.png" />
+    <Content Include="Content\images\v4c\spekettle.gif" />
+    <Content Include="Content\images\v4c\spooky.gif" />
+    <Content Include="Content\images\v4c\ss.gif" />
+    <Content Include="Content\images\v4c\ssd.gif" />
+    <Content Include="Content\images\v4c\VffoS.jpg" />
+    <Content Include="Content\images\v4c\wee2.gif" />
+    <Content Include="Content\images\v4c\zgabe.gif" />
+    <Content Include="Content\images\v4c\zgo.gif" />
+    <Content Include="Content\images\v4c\zgobz.jpg" />
+    <Content Include="Content\images\v4c\ztop.gif" />
     <Content Include="Content\jquery.mobile-1.0rc2.css" />
     <Content Include="Content\jquery.mobile-1.0rc2.min.css" />
     <Content Include="Content\jquery.mobile.structure-1.0rc2.css" />
@@ -1089,6 +1131,7 @@
   <ItemGroup>
     <Content Include="Chat.emoji.js" />
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
