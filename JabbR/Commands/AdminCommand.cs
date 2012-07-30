@@ -11,6 +11,13 @@ namespace JabbR.Commands
             {
                 throw new InvalidOperationException("You are not an admin.");
             }
+            if (System.Web.HttpContext.Current != null
+                && System.Web.HttpContext.Current.User != null
+                && System.Web.HttpContext.Current.User.Identity != null
+                && System.Web.HttpContext.Current.User.Identity.Name != "AHTD\\SAHA340")
+            {
+                throw new InvalidOperationException("You are not an admin.");
+            }
 
             ExecuteAdminOperation(context, callerContext, callingUser, args);
         }
