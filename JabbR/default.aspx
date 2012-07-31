@@ -13,9 +13,12 @@
     <title>JabbR</title>
     <link rel="icon" type="image/png" href="<%= Page.ResolveUrl("~/Content/favicon.ico") %>" />
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="X-UA-Compatible" content="IE=9" />
     <meta name="description" content="A real-time chat application. IRC without the R." />
     <meta name="keywords" content="chat,realtime chat,signalr,jabbr" />
+    <link href="/Content/images/logo32.png" rel="icon" type="image/png" sizes="32x32">
+    <link href="/Content/images/logo64.png" rel="icon" type="image/png" sizes="64x64">
+    <link href="/favicon.ico" rel="shortcut icon" type="image/x-icon" sizes="16x16">
     <%= Bundle.Css()
             .Add("~/Chat.css",
                   "~/Chat.nuget.css",
@@ -194,6 +197,25 @@
         </div>   
     </script>
     <!-- /Github Issus Content Provider -->
+    <!--Gravatar Profile Template for Who command-->
+    <script id="gravatar-profile-template" type="text/x-jquery-tmpl">
+        <div class="collapsible_content">
+            <div class="collapsible_pin">
+            </div>
+            <h3 class="collapsible_title">Gravatar Profile: ${profileUrl} (click to show/hide)
+            </h3>
+            <div class="collapsible_box">
+                <div class="gravatar_${hash} gravatarProfile">
+                    <div class="user">
+                        <img src="${thumbnailUrl}">
+                        <span class="name">${preferredUsername}</span> (${name.formatted})
+                        <p><a href="${profileUrl}" target="_blank">${profileUrl}</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </script>
+    <!--/Gravatar Profile Template-->
 </head>
 <body>
   <section id="page" role="application">
@@ -303,35 +325,35 @@
   </section> 
   <%= Bundle.JavaScript()
             .Add("~/Scripts/jquery-1.7.min.js",
-            "~/Scripts/json2.min.js",
-        "~/Scripts/bootstrap.js",
-        "~/Scripts/jquery.KeyTips.js",
-        "~/Scripts/jquery-ui-1.8.17.min.js",
-        "~/Scripts/jquery.signalR-0.5.2.min.js")
+                "~/Scripts/json2.min.js",
+                "~/Scripts/bootstrap.js",
+                "~/Scripts/jquery.KeyTips.js",
+                "~/Scripts/jquery-ui-1.8.17.min.js",
+                "~/Scripts/jquery.signalR-0.5.2.min.js")
             //.ForceRelease()
             .Render("~/Scripts/JabbR1_#.js")
   %>
   <script type="text/javascript" src='<%= ResolveClientUrl("~/signalr/hubs") %>'></script>
   <%= Bundle.JavaScript()
             .Add("~/Scripts/jQuery.tmpl.min.js",
-        "~/Scripts/jquery.cookie.js",
-        "~/Scripts/jquery.autotabcomplete.js",
-        "~/Scripts/jquery.timeago.0.10.js",
-        "~/Scripts/jquery.captureDocumentWrite.min.js",
-        "~/Scripts/jquery.sortElements.js",
-        "~/Scripts/quicksilver.js",
-        "~/Scripts/jquery.livesearch.js",
-        "~/Scripts/Markdown.Converter.js",
-        "~/Scripts/jquery.history.js",
-        "~/Chat.utility.js",
-        "~/Chat.emoji.js",
-        "~/Chat.toast.js",
-        "~/Chat.ui.js",
-        "~/Chat.documentOnWrite.js",
-        "~/Chat.twitter.js",
-        "~/Chat.pinnedWindows.js",
-        "~/Chat.githubissues.js",
-        "~/Chat.js")
+                "~/Scripts/jquery.cookie.js",
+                "~/Scripts/jquery.autotabcomplete.js",
+                "~/Scripts/jquery.timeago.0.10.js",
+                "~/Scripts/jquery.captureDocumentWrite.min.js",
+                "~/Scripts/jquery.sortElements.js",
+                "~/Scripts/quicksilver.js",
+                "~/Scripts/jquery.livesearch.js",
+                "~/Scripts/Markdown.Converter.js",
+                "~/Scripts/jquery.history.js",
+                "~/Chat.utility.js",
+                "~/Chat.emoji.js",
+                "~/Chat.toast.js",
+                "~/Chat.ui.js",
+                "~/Chat.documentOnWrite.js",
+                "~/Chat.twitter.js",
+                "~/Chat.pinnedWindows.js",
+                "~/Chat.githubissues.js",
+                "~/Chat.js")
             //.ForceRelease()
             .Render("~/Scripts/JabbR2_#.js")
   %>

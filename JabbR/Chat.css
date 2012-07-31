@@ -243,6 +243,7 @@
   {
     word-wrap: break-word;
     vertical-align: middle;
+    cursor: pointer;
   }
 
   .users li.room.closed .name
@@ -625,6 +626,7 @@ li.room
     .message .left .name
     {
       font-weight: bold;
+      cursor: pointer;
     }
 
   .message.failed .left .state
@@ -2139,3 +2141,41 @@ li.clearfix
 {
   margin: 0 auto;
 }
+
+.gravatarProfile
+{
+    margin-left: 30px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    padding: 6px;
+    min-height: 80px;
+}
+
+.gravatarProfile p
+{
+    margin: 0px;
+    padding: 0px;
+}
+
+.gravatarProfile time
+{
+    font-size: .8em;
+}
+
+.gravatarProfile img
+{
+    float: left;
+    margin-right: 5px;
+}
+
+.gravatarProfile .user
+{
+    margin-bottom: 5px;
+}
+
+.gravatarProfile .name
+{
+    font-weight: bold;
+    font-size: 15px;
+}
+  

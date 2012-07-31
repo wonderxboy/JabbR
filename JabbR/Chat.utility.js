@@ -32,6 +32,14 @@
         return this[0].scrollTop + this.height() >= this[0].scrollHeight;
     };
 
+    $.fn.expandableContent = function () {
+        // These are selectors to various rich content that may increase the
+        // scrollable area after they were initially appended
+        var selectors = ['img'];
+
+        return this.find(selectors.join(','));
+    };
+
     // REVIEW: is it safe to assume we do not need to strip tags before decoding?
     function decodeHtml(html) {
         // should we strip tags before running this?
@@ -93,6 +101,11 @@
 
         return parseInt((t1 - t2) / (24 * 3600 * 1000));
     };
+
+    // adds a certain number of days to a Date object
+    Date.prototype.addDays = function (days) {
+        return new Date(this.getTime() + 1000 * 3600 * 24 * days);
+    }
 
     var utility = {
         trim: function (value, length) {

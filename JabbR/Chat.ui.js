@@ -21,7 +21,7 @@
         templates = null,
         focus = true,
         commands = [],
-        Keys = { Up: 38, Down: 40, Esc: 27, Enter: 13, Slash: 47, Space: 32 },
+        Keys = { Up: 38, Down: 40, Esc: 27, Enter: 13, Slash: 47, Space: 32, Tab: 9 },
         scrollTopThreshold = 75,
         toast = window.chat.toast,
         preferences = null,
@@ -154,7 +154,11 @@
         };
 
         this.scrollToBottom = function () {
-            this.messages.scrollTop(this.messages[0].scrollHeight);
+            var height = this.messages[0].scrollHeight - this.messages.height();
+
+            this.messages
+                .scrollTop(height - 1) // Fix for bug in Chrome
+                .scrollTop(height);
         };
 
         this.isNearTheEnd = function () {
@@ -750,17 +754,17 @@
         //lets store any events to be triggered as constants here to aid intellisense and avoid
         //string duplication everywhere
         events: {
-            closeRoom: 'closeRoom',
-            prevMessage: 'prevMessage',
-            openRoom: 'openRoom',
-            nextMessage: 'nextMessage',
-            activeRoomChanged: 'activeRoomChanged',
-            scrollRoomTop: 'scrollRoomTop',
-            typing: 'typing',
-            sendMessage: 'sendMessage',
-            focusit: 'focusit',
-            blurit: 'blurit',
-            preferencesChanged: 'preferencesChanged'
+            closeRoom: 'jabbr.ui.closeRoom',
+            prevMessage: 'jabbr.ui.prevMessage',
+            openRoom: 'jabbr.ui.openRoom',
+            nextMessage: 'jabbr.ui.nextMessage',
+            activeRoomChanged: 'jabbr.ui.activeRoomChanged',
+            scrollRoomTop: 'jabbr.ui.scrollRoomTop',
+            typing: 'jabbr.ui.typing',
+            sendMessage: 'jabbr.ui.sendMessage',
+            focusit: 'jabbr.ui.focusit',
+            blurit: 'jabbr.ui.blurit',
+            preferencesChanged: 'jabbr.ui.preferencesChanged'
         },
 
         initialize: function (state) {
@@ -788,7 +792,8 @@
                 message: $('#new-message-template'),
                 notification: $('#new-notification-template'),
                 separator: $('#message-separator-template'),
-                tab: $('#new-tab-template')
+                tab: $('#new-tab-template'),
+                gravatarprofile: $('#gravatar-profile-template')
             };
 
             if (toast.canToast()) {
@@ -845,6 +850,51 @@
                     ui.expandNotifications($notification);
                 }
             });
+
+            // handle tab cycling - we skip the lobby when cycling
+            $document.on('keydown', function (ev) {
+                if (ev.keyCode === Keys.Tab && $newMessage.val() === "") {
+                    var current = getCurrentRoomElements(),
+                        index = current.tab.index(),
+                        tabCount = $tabs.children().length - 1;
+
+                    if (!ev.shiftKey) {
+                        // Next tab
+                        index = index % tabCount + 1;
+                    } else {
+                        // Prev tab
+                        index = (index - 1) || tabCount;
+                    }
+
+                    ui.setActiveRoom($tabs.children().eq(index).data('name'));
+                    $newMessage.focus();
+                }
+            });
+
+            // handle click on names in chat / room list
+            var prepareMessage = function(ev) {
+                var message = $newMessage.val().trim();
+
+                // If it was a message to another person, replace that
+                if (message.indexOf('/msg') === 0) {
+                    message = message.replace(/^\/msg \S+/, '');
+                }
+
+                // Re-focus because we lost it on the click
+                $newMessage.focus();
+
+                // Do not convert this to a message if it is a command
+                if (message[0] === '/') {
+                    return false;
+                }
+
+                // Prepend our target username
+                message = '/msg ' + $(this).text().trim() + ' ' + message;
+                ui.setMessage(message);
+                return false;
+            }
+            $document.on('click', '.users li.user .name', prepareMessage);
+            $document.on('click', '.message .left .name', prepareMessage);
 
             $submitButton.click(function (ev) {
                 triggerSend();
@@ -987,12 +1037,14 @@
                 var key = ev.keyCode || ev.which;
                 switch (key) {
                     case Keys.Up:
-                        cycleMessage(ui.events.prevMessage);
-                        ev.preventDefault();
+                        if (cycleMessage(ui.events.prevMessage)) {
+                            ev.preventDefault();
+                        }
                         break;
                     case Keys.Down:
-                        cycleMessage(ui.events.nextMessage);
-                        ev.preventDefault();
+                        if (cycleMessage(ui.events.nextMessage)) {
+                            ev.preventDefault();
+                        }
                         break;
                     case Keys.Esc:
                         $(this).val('');
@@ -1010,11 +1062,14 @@
                 }
             });
 
+            // Returns true if a cycle was triggered
             function cycleMessage(messageHistoryDirection) {
                 var currentMessage = $newMessage[0].value;
                 if (currentMessage.length === 0 || lastCycledMessage === currentMessage) {
                     $ui.trigger(messageHistoryDirection);
+                    return true;
                 }
+                return false;
             }
 
             // Auto-complete for user names
@@ -1173,6 +1228,36 @@
                 room.scrollToBottom();
             }
         },
+        watchMessageScroll: function (messageIds, roomName) {
+            // Given an array of message ids, if there is any embedded content
+            // in it, it may cause the window to scroll off of the bottom, so we
+            // can watch for that and correct it.
+            messageIds = $.map(messageIds, function (id) { return '#m-' + id; });
+
+            var $messages = $(messageIds.join(',')),
+                $content = $messages.expandableContent(),
+                room = getRoomElements(roomName),
+                nearTheEndBefore = room.messages.isNearTheEnd(),
+                scrollTopBefore = room.messages.scrollTop();
+
+            if (nearTheEndBefore && $content.length > 0) {
+                // Note that the load event does not bubble, so .on() is not
+                // suitable here.
+                $content.load(function (event) {
+                    // If we used to be at the end and our scrollTop() did not
+                    // change, then we can safely call scrollToBottom() without
+                    // worrying about interrupting the user. We skip this if the
+                    // room is already at the end in the event of multiple
+                    // images loading at the same time.
+                    if (!room.messages.isNearTheEnd() && scrollTopBefore === room.messages.scrollTop()) {
+                        room.scrollToBottom();
+                    }
+
+                    // unbind the event from this object after it executes
+                    $(this).unbind(event);
+                });
+            }
+        },
         isNearTheEnd: function (roomName) {
             var room = roomName ? getRoomElements(roomName) : getCurrentRoomElements();
 
@@ -1180,8 +1265,14 @@
         },
         populateLobbyRooms: function (rooms) {
             var lobby = getLobby(),
-            // sort lobby by room count descending
+            // sort lobby by room open ascending then count descending
             sorted = rooms.sort(function (a, b) {
+                if (a.Closed && !b.Closed) {
+                    return 1;
+                } else if (b.Closed && !a.Closed) {
+                    return -1;
+                }
+
                 return a.Count > b.Count ? -1 : 1;
             });
 
@@ -1300,6 +1391,15 @@
             $user.find('.gravatar')
                  .attr('src', src);
         },
+        showGravatarProfile: function (profile) {
+            var room = getCurrentRoomElements(),
+                nearEnd = ui.isNearTheEnd();
+
+            this.appendMessage(templates.gravatarprofile.tmpl(profile), room);
+            if (nearEnd) {
+                ui.scrollToBottom();
+            }
+        },
         removeUser: function (user, roomName) {
             var room = getRoomElements(roomName),
                 $user = room.getUser(user.Name);
@@ -1313,6 +1413,11 @@
             var room = getRoomElements(roomName),
                 $user = room.getUser(userViewModel.name),
                 timeout = null;
+
+            // if the user is somehow missing from room, add them
+            if ($user.length === 0) {
+                ui.addUser(userViewModel, roomName);
+            }
 
             // Do not show typing indicator for current user
             if (userViewModel.name === ui.getUserName()) {
@@ -1341,12 +1446,25 @@
                 $previousMessage = null,
                 $current = null,
                 previousUser = null,
-                previousTimestamp = new Date();
+                previousTimestamp = new Date().addDays(1); // Tomorrow so we always see a date line
 
             if (messages.length === 0) {
                 // Mark this list as full
                 $messages.data('full', true);
                 return;
+            }
+
+            // If our top message is a date header, it might be incorrect, so we
+            // check to see if we should remove it so that it can be inserted
+            // again at a more appropriate time.
+            if ($target.is('.list-header.date-header')) {
+                var postedDate = new Date($target.text()).toDate();
+                var lastPrependDate = messages[messages.length - 1].date.toDate();
+
+                if (!lastPrependDate.diffDays(postedDate)) {
+                    $target.remove();
+                    $target = $messages.children().first();
+                }
             }
 
             // Populate the old messages
@@ -1360,7 +1478,11 @@
 
                 if (this.date.toDate().diffDays(previousTimestamp.toDate())) {
                     ui.addMessageBeforeTarget(this.date.toLocaleDateString(), 'list-header', $target)
+                      .addClass('date-header')
                       .find('.right').remove(); // remove timestamp on date indicator
+
+                    // Force a user name to show after the header
+                    previousUser = null;
                 }
 
                 // Determine if we need to show the user
@@ -1376,6 +1498,14 @@
                 $previousMessage = $('#m-' + this.id);
             });
 
+            // If our old top message is a message from the same user as the
+            // last message in our prepended history, we can remove information
+            // and continue
+            if ($target.is('.message') && $target.data('name') === $previousMessage.data('name')) {
+                $target.find('.left').children().not('.state').remove();
+                $previousMessage.addClass('continue');
+            }
+
             // Scroll to the bottom element so the user sees there's more messages
             $target[0].scrollIntoView();
         },
@@ -1383,7 +1513,7 @@
             var room = getRoomElements(roomName),
                 $previousMessage = room.messages.children().last(),
                 previousUser = null,
-                previousTimestamp = new Date(),
+                previousTimestamp = new Date().addDays(1), // Tomorrow so we always see a date line
                 showUserName = true,
                 $message = null,
                 isMention = message.highlight;
@@ -1396,6 +1526,11 @@
             if ($previousMessage.length > 0) {
                 previousUser = $previousMessage.data('name');
                 previousTimestamp = new Date($previousMessage.data('timestamp') || new Date());
+            }
+
+            // Force a user name to show if a header will be displayed
+            if (message.date.toDate().diffDays(previousTimestamp.toDate())) {
+                previousUser = null;
             }
 
             // Determine if we need to show the user name next to the message
@@ -1417,12 +1552,7 @@
                 room.addSeparator();
             }
 
-            if (message.date.toDate().diffDays(previousTimestamp.toDate())) {
-                ui.addMessage(message.date.toLocaleDateString(), 'list-header', roomName)
-                  .find('.right').remove(); // remove timestamp on date indicator
-            }
-
-            templates.message.tmpl(message).appendTo(room.messages);
+            this.appendMessage(templates.message.tmpl(message), room);
 
             if (room.isInitialized()) {
                 if (isMention) {
@@ -1498,8 +1628,9 @@
                 nearEnd = room.isNearTheEnd(),
                 $element = null;
 
-            $element = ui.prepareNotificationMessage(content, type)
-                         .appendTo(room.messages);
+            $element = ui.prepareNotificationMessage(content, type);
+
+            this.appendMessage($element, room);
 
             if (type === 'notification' && room.isLobby() === false) {
                 ui.collapseNotifications($element);
@@ -1510,6 +1641,21 @@
             }
 
             return $element;
+        },
+        appendMessage: function (newMessage, room) {
+            // Determine if we need to show a new date header
+            if (!$(newMessage).is('.date-header')) {
+                var lastMessage = room.messages.find('li[data-timestamp]').last(),
+                    lastDate = new Date(lastMessage.data('timestamp')),
+                    thisDate = new Date($(newMessage).data('timestamp'));
+
+                if (!lastMessage.length || thisDate.toDate().diffDays(lastDate.toDate())) {
+                    ui.addMessage(thisDate.toLocaleDateString(), 'date-header list-header', room.getName())
+                      .find('.right').remove(); // remove timestamp on date indicator
+                }
+            }
+
+            $(newMessage).appendTo(room.messages);
         },
         hasFocus: function () {
             return ui.focus;
