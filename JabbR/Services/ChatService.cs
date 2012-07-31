@@ -700,11 +700,25 @@ namespace JabbR.Services
             {
                 throw new InvalidOperationException("You are not an admin");
             }
+            if (System.Web.HttpContext.Current != null
+                && System.Web.HttpContext.Current.User != null
+                && System.Web.HttpContext.Current.User.Identity != null
+                && System.Web.HttpContext.Current.User.Identity.Name != "AHTD\\SAHA340")
+            {
+                throw new InvalidOperationException("You are not an admin");
+            }
         }
 
         private static void EnsureOwnerOrAdmin(ChatUser user, ChatRoom room)
         {
             if (!room.Owners.Contains(user) && !user.IsAdmin)
+            {
+                throw new InvalidOperationException("You are not an owner of room '" + room.Name + "'");
+            }
+            if (!room.Owners.Contains(user) && System.Web.HttpContext.Current != null
+                && System.Web.HttpContext.Current.User != null
+                && System.Web.HttpContext.Current.User.Identity != null
+                && System.Web.HttpContext.Current.User.Identity.Name != "AHTD\\SAHA340")
             {
                 throw new InvalidOperationException("You are not an owner of room '" + room.Name + "'");
             }
@@ -729,6 +743,13 @@ namespace JabbR.Services
         private static void EnsureCreatorOrAdmin(ChatUser user, ChatRoom room)
         {
             if (user != room.Creator && !user.IsAdmin)
+            {
+                throw new InvalidOperationException("You are not the creator of room '" + room.Name + "'");
+            }
+            if (user != room.Creator && System.Web.HttpContext.Current != null
+                && System.Web.HttpContext.Current.User != null
+                && System.Web.HttpContext.Current.User.Identity != null
+                && System.Web.HttpContext.Current.User.Identity.Name != "AHTD\\SAHA340")
             {
                 throw new InvalidOperationException("You are not the creator of room '" + room.Name + "'");
             }
