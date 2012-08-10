@@ -869,7 +869,7 @@ namespace JabbR.Services
 
         public void DeleteRoom(ChatUser user, ChatRoom targetRoom)
         {
-            EnsureAdmin(user);
+            EnsureCreatorOrAdmin(user, targetRoom);
 
             var roomUsers = targetRoom.Users.ToList();
 
@@ -884,6 +884,7 @@ namespace JabbR.Services
 
             targetRoom.AllowedUsers.Clear();
             targetRoom.Owners.Clear();
+            targetRoom.Messages.Clear();
 
             _repository.Remove(targetRoom);
         }
