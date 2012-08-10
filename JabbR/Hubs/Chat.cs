@@ -74,17 +74,25 @@ namespace JabbR
             {
                 try
                 {
-                    // Create them a user account using default Windows auth
-                    var employee = GetEmployee(clientState.UserId);
+                    var userId = StripNTDomain(Context.User.Identity.Name);
 
-                    if (employee.DivisionDistrictIndicator != "C290")
-                        throw new InvalidOperationException("Must be a Computer Services employee to login.");
+                    // Try to match on identity
+                    user = _repository.GetUserByIdentity(userId);
 
-                    string displayName = (employee == null) ? "anon" : employee.FirstName.Replace(' ', '_');
+                    if (user == null)
+                    {
+                        // Create them a user account using default Windows auth
+                        var employee = GetEmployee(userId);
 
-                    user = _service.AddUser(displayName, clientState.UserId, employee.Email);
+                        if (employee.DivisionDistrictIndicator != "C290")
+                            throw new InvalidOperationException("Must be a Computer Services employee to login.");
 
-                    user.EmployeeId = employee.EmployeeId.ToString();
+                        string displayName = (employee == null) ? "anon" : employee.FirstName.Replace(' ', '_');
+
+                        user = _service.AddUser(displayName, userId, employee.Email);
+
+                        user.EmployeeId = employee.EmployeeId.ToString();
+                    }
                 }
                 catch
                 {
@@ -1013,7 +1021,7 @@ namespace JabbR
 
             if (String.IsNullOrEmpty(jabbrState))
             {
-                clientState = new ClientState() { UserId = StripNTDomain(Context.User.Identity.Name) };
+                clientState = new ClientState();
             }
             else
             {

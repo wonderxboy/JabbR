@@ -128,6 +128,31 @@
   position: absolute;
 }
 
+#preferences .emotelist
+{
+  background: url('Content/images/emotelist.png') no-repeat;
+  width: 20px;
+  height: 20px;
+  left: 120px;
+  top: 3px;
+  position: absolute;
+}
+
+#emotelist-dialog
+{
+    max-height: 650px;
+}
+
+#emotelist-dialog > div
+{
+    overflow: auto;
+}
+
+#emotelist-dialog td
+{
+    cursor: pointer;
+}
+
 #logo
 {
   margin-top: 10px;

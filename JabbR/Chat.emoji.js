@@ -8,6 +8,115 @@ var EmojiIcons;
     var validAlias = { "\\:-?\\)" : ":smile:", ":-?D\\b": ":smiley:", ";-?\\)" : ":wink:", "\\:-?\\(": ":cry:", ":-?P\\b" : ":tongue:", ":-?p\\b" : ":tongue:", ":-?O\\b" : ":astonished:", ":-?o\\b" : ":astonished:" };
     var util = window.chat.utility;
 
+    // initialize emote list dialog
+    var emotelistTabs = $('<div/>');
+
+    emotelistTabs.append(
+        $('<ul/>')
+            .append($('<li/>')
+                .append($('<a/>').attr('href', '#emotelisttab-1').text('a')))
+            .append($('<li/>')
+                .append($('<a/>').attr('href', '#emotelisttab-2').text('b')))
+            .append($('<li/>')
+                .append($('<a/>').attr('href', '#emotelisttab-3').text('c')))
+            .append($('<li/>')
+                .append($('<a/>').attr('href', '#emotelisttab-4').text('e')))
+            .append($('<li/>')
+                .append($('<a/>').attr('href', '#emotelisttab-5').text('j')))
+            .append($('<li/>')
+                .append($('<a/>').attr('href', '#emotelisttab-6').text('v'))))
+
+    var colCount = { 'a': 0, 'b': 0, 'c': 0, 'e': 0, 'j': 0, 'v': 0 };
+    var rows = { 'a': [], 'b': [], 'c': [], 'e': [], 'j': [], 'v': [] };
+
+    for(var key in validPony) {
+        var row = '';
+        var group = validPony[key];
+
+        colCount[group] = colCount[group] + 1;
+
+        if (colCount[group] == 1)
+             row += '<tr>';
+
+        row += '<td class="ponymoticon ponymoticon-' + group + ' ponymoticon-' + key + '" title="' + key + '"></td>';
+
+        if (colCount[group] == 3)
+        {
+            row += '</tr>';
+            colCount[group] = 0;
+        }
+
+        rows[group].push(row);
+    }
+    for(var key in validEmoji) {
+        var row = '';
+        var group = 'j';
+
+        colCount[group] = colCount[group] + 1;
+
+        if (colCount[group] == 1)
+             row += '<tr>';
+
+        var css = key;
+        if (css === '+1') {
+            css = 'plus1';    // +1 not valid CSS class
+        }
+        row += '<td class="emoji20 emoji20-' + css + '" title="' + key + '"></td>';
+
+        if (colCount[group] == 10)
+        {
+            row += '</tr>';
+            colCount[group] = 0;
+        }
+
+        rows[group].push(row);
+    }
+    for(var key in validv4c) {
+        var row = '';
+        var group = 'v';
+
+        colCount[group] = colCount[group] + 1;
+
+        if (colCount[group] == 1)
+             row += '<tr>';
+
+        row += '<td title="' + key + '"><img src="Content/images/v4c/'+ validv4c[key] + '" alt="' + key + '" /></td>';
+
+        if (colCount[group] == 3)
+        {
+            row += '</tr>';
+            colCount[group] = 0;
+        }
+
+        rows[group].push(row);
+    }
+
+    emotelistTabs.append(
+        $('<table/>').attr('id', 'emotelisttab-1').append(rows['a'].join('')));
+    emotelistTabs.append(
+        $('<table/>').attr('id', 'emotelisttab-2').append(rows['b'].join('')));
+    emotelistTabs.append(
+        $('<table/>').attr('id', 'emotelisttab-3').append(rows['c'].join('')));
+    emotelistTabs.append(
+        $('<table/>').attr('id', 'emotelisttab-4').append(rows['e'].join('')));
+    emotelistTabs.append(
+        $('<table/>').attr('id', 'emotelisttab-5').append(rows['j'].join('')));
+    emotelistTabs.append(
+        $('<table/>').attr('id', 'emotelisttab-6').append(rows['v'].join('')));
+
+    emotelistTabs.tabs();
+    $('#emotelist-dialog').append(emotelistTabs);
+
+    $('#emotelist-dialog td').each(function(i) {
+        $(this).click(function() {
+            var messageBox = $('#new-message');
+
+            messageBox.val(messageBox.val() + ':' + $(this).attr('title') + ':').focus();
+
+            $('#emotelist-dialog').dialog('close');
+        });
+    });
+
     Emoji.getIcons = function() {
         if (EmojiIcons == null)
         {

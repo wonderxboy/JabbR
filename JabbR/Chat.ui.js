@@ -34,7 +34,9 @@
         $roomFilterInput = null,
         updateTimeout = 15000,
         $richness = null,
-        lastPrivate = null;
+        lastPrivate = null,
+        $emotelist = null,
+        $emotelistDialog = null;
 
     function getRoomId(roomName) {
         return escape(roomName.toLowerCase()).replace(/[^a-z0-9]/, '_');
@@ -778,6 +780,8 @@
             $sound = $('#preferences .sound');
             $richness = $('#preferences .richness');
             $downloadIcon = $('#preferences .download');
+            $emotelist = $('#preferences .emotelist');
+            $emotelistDialog = $('#emotelist-dialog');
             $downloadDialog = $('#download-dialog');
             $downloadDialogButton = $('#download-dialog-button');
             $downloadRange = $('#download-range');
@@ -802,6 +806,7 @@
             else {
                 $richness.css({ left: '26px' });
                 $downloadIcon.css({ left: '62px' });
+                $emotelist.css({ left: '92px' });
                 // We need to set the toast setting to false
                 preferences.canToast = false;
             }
@@ -872,7 +877,7 @@
             });
 
             // handle click on names in chat / room list
-            var prepareMessage = function(ev) {
+            var prepareMessage = function (ev) {
                 var message = $newMessage.val().trim();
 
                 // If it was a message to another person, replace that
@@ -1015,6 +1020,21 @@
 
                 $downloadDialog.modal('hide');
             });
+
+            $emotelist.click(function () {
+                // toggle emote list dialog
+                if ($emotelistDialog.dialog('isOpen'))
+                    $emotelistDialog.dialog('close');
+                else
+                    $emotelistDialog.dialog('open');
+            });
+
+            $emotelistDialog.dialog({
+                autoOpen: false,
+                draggable: false,
+                resizable: false,
+                width: 320,
+                position: ['right', 150]});
 
             $window.blur(function () {
                 ui.focus = false;

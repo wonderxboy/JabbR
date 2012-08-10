@@ -28,7 +28,8 @@
                   "~/Content/KeyTips.css",
                   "~/Content/bootstrap.min.css",
                   "~/Content/emoji20.css",
-                  "~/Content/ponymoticon.css")
+                  "~/Content/ponymoticon.css",
+                  "~/Content/themes/base/jquery-ui.css")
             //.ForceRelease()
             .Render("~/Content/JabbR_#.css")
   %>
@@ -252,6 +253,7 @@
         <a class="richness" title="toggle rich-content"></a>
         <a class="toast" title="popup notifications" aria-haspopup="true"></a>
         <a class="download" title="download messages" aria-haspopup="true"></a>
+        <a class="emotelist" title="emote list"></a>
       </div>
       <form id="send-message" action="#">
       <div id="message-box">
@@ -300,6 +302,7 @@
           <a href="#" class="btn btn-primary" id="download-dialog-button">Download</a>
         </div>
       </div>
+      <div id="emotelist-dialog" title="emote list"></div>
       <div id="jabbr-update" class="modal hide fade">
         <div class="modal-header">
           <a class="close" data-dismiss="modal">&times;</a>
