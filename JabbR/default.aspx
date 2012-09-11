@@ -11,14 +11,13 @@
 <html>
 <head>
     <title>JabbR</title>
-    <link rel="icon" type="image/png" href="<%= Page.ResolveUrl("~/Content/favicon.ico") %>" />
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=9" />
     <meta name="description" content="A real-time chat application. IRC without the R." />
     <meta name="keywords" content="chat,realtime chat,signalr,jabbr" />
-    <link href="/Content/images/logo32.png" rel="icon" type="image/png" sizes="32x32">
-    <link href="/Content/images/logo64.png" rel="icon" type="image/png" sizes="64x64">
-    <link href="/favicon.ico" rel="shortcut icon" type="image/x-icon" sizes="16x16">
+    <link href="<%= Page.ResolveUrl("~/Content/images/logo32.png") %>" rel="icon" type="image/png" sizes="32x32">
+    <link href="<%= Page.ResolveUrl("~/Content/images/logo64.png") %>" rel="icon" type="image/png" sizes="64x64">
+    <link rel="shortcut icon" href="favicon.ico" />
     <%= Bundle.Css()
             .Add("~/Chat.css",
                   "~/Chat.nuget.css",
