@@ -1,6 +1,6 @@
-.ponymoticon { background-repeat: no-repeat; background-repeat: no-repeat; position: relative; display: inline-block; top: 5px; margin-top: -5px; }
+.ponymoticon { background-repeat: no-repeat; background-repeat: no-repeat; position: relative; display: inline-block; top: 5px; margin-top: -5px; padding: 0; }
 .ponymoticon-a { background-image: url(images/ponymoticon/a.png); width: 70px; height: 70px; }
-.ponymoticon-b { background-image: url(images/ponymoticon/b.png); width: 50px; height: 50px; }
+.ponymoticon-b { background-image: url(images/ponymoticon/b.png); width: 70px; height: 70px; }
 .ponymoticon-c { background-image: url(images/ponymoticon/c.png); width: 70px; height: 70px; }
 .ponymoticon-e { background-image: url(images/ponymoticon/e.png); width: 70px; height: 70px; }
 
@@ -35,45 +35,45 @@
 .ponymoticon-chrysalis { background-position: -70px -630px; }
 .ponymoticon-cadence { background-position: -140px -630px; }
 .ponymoticon-flutterfear { background-position: -0px -0px; }
-.ponymoticon-ppboring { background-position: -50px -0px; }
-.ponymoticon-rarityyell { background-position: -100px -0px; }
-.ponymoticon-fluttershy { background-position: -150px -0px; }
-.ponymoticon-ajcower { background-position: -0px -50px; }
-.ponymoticon-ajsly { background-position: -50px -50px; }
-.ponymoticon-eeyup { background-position: -100px -50px; }
-.ponymoticon-rdsmile { background-position: -150px -50px; }
-.ponymoticon-fluttersrs { background-position: -0px -100px; }
-.ponymoticon-raritydress { background-position: -50px -100px; }
-.ponymoticon-takealetter { background-position: -100px -100px; }
-.ponymoticon-rdwut { background-position: -150px -100px; }
-.ponymoticon-ppshrug { background-position: -0px -150px; }
-.ponymoticon-spikenervous { background-position: -50px -150px; }
-.ponymoticon-noooo { background-position: -100px -150px; }
-.ponymoticon-dj { background-position: -150px -150px; }
-.ponymoticon-fluttershh { background-position: -0px -200px; }
-.ponymoticon-flutteryay { background-position: -50px -200px; }
-.ponymoticon-squintyjack { background-position: -100px -200px; }
-.ponymoticon-spikepushy { background-position: -150px -200px; }
-.ponymoticon-ajugh { background-position: -0px -250px; }
-.ponymoticon-raritywut { background-position: -50px -250px; }
-.ponymoticon-dumbfabric { background-position: -100px -250px; }
-.ponymoticon-raritywhy { background-position: -150px -250px; }
-.ponymoticon-trixiesmug { background-position: -0px -300px; }
-.ponymoticon-flutterwink { background-position: -50px -300px; }
-.ponymoticon-rarityannoyed { background-position: -100px -300px; }
-.ponymoticon-soawesome { background-position: -150px -300px; }
-.ponymoticon-ajwut { background-position: -0px -350px; }
-.ponymoticon-twisquint { background-position: -50px -350px; }
-.ponymoticon-raritywhine { background-position: -100px -350px; }
-.ponymoticon-rdcool { background-position: -150px -350px; }
-.ponymoticon-abwut { background-position: -0px -400px; }
-.ponymoticon-manspike { background-position: -50px -400px; }
-.ponymoticon-cockatrice { background-position: -100px -400px; }
-.ponymoticon-facehoof { background-position: -150px -400px; }
-.ponymoticon-rarityjudge { background-position: -0px -450px; }
-.ponymoticon-rarityprimp { background-position: -50px -450px; }
-.ponymoticon-twirage { background-position: -100px -450px; }
-.ponymoticon-ppseesyou { background-position: -150px -450px; }
+.ponymoticon-ppboring { background-position: -70px -0px; }
+.ponymoticon-rarityyell { background-position: -140px -0px; }
+.ponymoticon-fluttershy { background-position: -210px -0px; }
+.ponymoticon-ajcower { background-position: -0px -70px; }
+.ponymoticon-ajsly { background-position: -70px -70px; }
+.ponymoticon-eeyup { background-position: -140px -70px; }
+.ponymoticon-rdsmile { background-position: -210px -70px; }
+.ponymoticon-fluttersrs { background-position: -0px -140px; }
+.ponymoticon-raritydress { background-position: -70px -140px; }
+.ponymoticon-takealetter { background-position: -140px -140px; }
+.ponymoticon-rdwut { background-position: -210px -140px; }
+.ponymoticon-ppshrug { background-position: -0px -210px; }
+.ponymoticon-spikenervous { background-position: -70px -210px; }
+.ponymoticon-noooo { background-position: -140px -210px; }
+.ponymoticon-dj { background-position: -210px -210px; }
+.ponymoticon-fluttershh { background-position: -0px -280px; }
+.ponymoticon-flutteryay { background-position: -70px -280px; }
+.ponymoticon-squintyjack { background-position: -140px -280px; }
+.ponymoticon-spikepushy { background-position: -210px -280px; }
+.ponymoticon-ajugh { background-position: -0px -350px; }
+.ponymoticon-raritywut { background-position: -70px -350px; }
+.ponymoticon-dumbfabric { background-position: -140px -350px; }
+.ponymoticon-raritywhy { background-position: -210px -350px; }
+.ponymoticon-trixiesmug { background-position: -0px -420px; }
+.ponymoticon-flutterwink { background-position: -70px -420px; }
+.ponymoticon-rarityannoyed { background-position: -140px -420px; }
+.ponymoticon-soawesome { background-position: -210px -420px; }
+.ponymoticon-ajwut { background-position: -0px -490px; }
+.ponymoticon-twisquint { background-position: -70px -490px; }
+.ponymoticon-raritywhine { background-position: -140px -490px; }
+.ponymoticon-rdcool { background-position: -210px -490px; }
+.ponymoticon-abwut { background-position: -0px -560px; }
+.ponymoticon-manspike { background-position: -70px -560px; }
+.ponymoticon-cockatrice { background-position: -140px -560px; }
+.ponymoticon-facehoof { background-position: -210px -560px; }
+.ponymoticon-rarityjudge { background-position: -0px -630px; }
+.ponymoticon-rarityprimp { background-position: -70px -630px; }
+.ponymoticon-twirage { background-position: -140px -630px; }
+.ponymoticon-ppseesyou { background-position: -210px -630px; }
 
 .ponymoticon-rdsitting { background-position: -0px -0px; }
 .ponymoticon-rdhappy { background-position: -70px -0px; }
