@@ -63,7 +63,7 @@ var EmojiIcons;
         }
         row += '<td class="emoji20 emoji20-' + css + '" title="' + key + '"></td>';
 
-        if (colCount[group] == 10)
+        if (colCount[group] == 11)
         {
             row += '</tr>';
             colCount[group] = 0;
