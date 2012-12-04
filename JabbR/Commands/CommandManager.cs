@@ -4,6 +4,7 @@ using System.ComponentModel.Composition.Hosting;
 using System.Linq;
 using JabbR.Models;
 using JabbR.Services;
+using JabbR.Commands.Exceptions;
 
 namespace JabbR.Commands
 {
@@ -95,9 +96,17 @@ namespace JabbR.Commands
             };
 
             ICommand command;
-            if (!TryMatchCommand(commandName, out command))
+            try
+            {
+                MatchCommand(commandName, out command);
+            }
+            catch (CommandNotFoundException)
             {
                 throw new InvalidOperationException(String.Format("'{0}' is not a valid command.", commandName));
+            }
+            catch (CommandAmbiguityException e)
+            {
+                throw new InvalidOperationException(String.Format("'{0}' is ambiguous: {1}.", commandName, e.Ambiguities.Aggregate((s, r) => s += ", " + r)));
             }
 
             command.Execute(context, callerContext, args);
@@ -105,7 +114,7 @@ namespace JabbR.Commands
             return true;
         }
 
-        private bool TryMatchCommand(string commandName, out ICommand command)
+        private void MatchCommand(string commandName, out ICommand command)
         {
             if (_commandCache == null)
             {
@@ -126,7 +135,11 @@ namespace JabbR.Commands
                                                       StringComparer.OrdinalIgnoreCase);
             }
 
-            return _commandCache.TryGetValue(commandName, out command);
+            ExpandCommand(_commandCache.Keys, ref commandName);
+
+            if(!_commandCache.TryGetValue(commandName, out command)) {
+                throw new CommandNotFoundException();
+            }
         }
 
         private static IList<ICommand> GetCommands()
@@ -153,6 +166,21 @@ namespace JabbR.Commands
                                Group = commandAttribute.Group
                            };
             return commands;
+        }
+
+        private static void ExpandCommand(IEnumerable<string> commandNames, ref string commandName)
+        {
+            var inputCommand = commandName;
+            var extended = commandNames.Where(comm => comm.StartsWith(inputCommand));
+
+            if (extended.Count() == 0) return;
+
+            try
+            {
+                commandName = extended.Single();
+            } catch(InvalidOperationException) {
+                throw new CommandAmbiguityException(extended);
+            }
         }
     }
 }
