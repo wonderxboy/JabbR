@@ -10,6 +10,7 @@ msbuild.log
 _Resharper*/
 _AzurePackage/
 *.ncrunchsolution
+*.orig
 JabbR*.css
 JabbR*.js
 JabbR.Publish.xml
