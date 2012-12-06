@@ -766,7 +766,6 @@ namespace JabbR
                 }
             }
         }
-        //TODO fix this method
         void INotificationService.DeleteRoom(IEnumerable<ChatUser> users, ChatRoom room)
         {
             // notify all members of room that it is now deleted
@@ -775,11 +774,11 @@ namespace JabbR
                 foreach (var client in user.ConnectedClients)
                 {
                     var userViewModel = new UserViewModel(user);
-                    Clients[room.Name].leave(userViewModel, room.Name).Wait();
+                    Clients.Group(room.Name).leave(userViewModel, room.Name).Wait();
 
                     Groups.Remove(client.Id, room.Name).Wait();
 
-                    Clients[client.Id].roomDeleted(room.Name);
+                    Clients.Client(client.Id).roomDeleted(room.Name);
                 }
             }
         }

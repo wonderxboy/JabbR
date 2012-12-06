@@ -5,7 +5,8 @@ using JabbR.Models;
 
 namespace JabbR.Commands
 {
-    [Command("delete", "Type /delete [room] to delete a room")]
+    //Type /delete [room] to delete a room
+    [Command("addadmin", "", "", "")]
     public class DeleteCommand : UserCommand
     {
         public override void Execute(CommandContext context, CallerContext callerContext, ChatUser callingUser, string[] args)
