@@ -54,7 +54,6 @@ namespace JabbR.App_Start
 
             kernel.Bind<IJabbrRepository>()
                 .To<CustomRepository>();
-                //TODO fix InRequestScope()?
 
             kernel.Bind<IChatService>()
                   .To<ChatService>();

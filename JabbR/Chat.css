@@ -48,7 +48,7 @@
 
 #users-filter-form 
 {
-	display: none;
+    display: none;
 }
 
 #users-filter
@@ -62,10 +62,10 @@
 
 #users-filter-closed-area 
 {
-	position: absolute;
-	top: 80px;
-	left: 71%;
-	margin-top: 4px;
+    position: absolute;
+    top: 80px;
+    left: 71%;
+    margin-top: 4px;
 }
 
 #preferences a
@@ -142,7 +142,7 @@
   background: url('Content/images/emotelist.png') no-repeat;
   width: 20px;
   height: 20px;
-  left: 120px;
+  left: 145px;
   top: 3px;
   position: absolute;
 }
@@ -2220,28 +2220,28 @@ li.clearfix
  
 #releaseArea 
 {
-	position: fixed; 
-	bottom: 0px; 
-	right: 0px;
+    position: fixed; 
+    bottom: 0px; 
+    right: 0px;
 }
   
   #releaseTag 
   {
-	  font-size: smaller;
-	  padding: 10px;
-	  margin: 0;
+      font-size: smaller;
+      padding: 10px;
+      margin: 0;
   }
 
     #releaseTag a 
     {
-	    color: #1C94C4;
-	    text-decoration: none;
+        color: #1C94C4;
+        text-decoration: none;
     }
   
     #releaseTag a:hover
     {
-	    color: #1C94C4;
-	    text-decoration: underline;
+        color: #1C94C4;
+        text-decoration: underline;
     }
     
 #jabbr-help

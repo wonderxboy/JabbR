@@ -1056,7 +1056,7 @@ namespace JabbR
             string value = cookie != null ? cookie.Value : null;
             return value != null ? HttpUtility.UrlDecode(value) : null;
         }
-	private Employee GetEmployee(string userId)
+    private Employee GetEmployee(string userId)
         {
             using (var context = new DirectoryContext())
             {

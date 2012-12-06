@@ -19,9 +19,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=9" />
     <meta name="description" content="A real-time chat application." />
     <meta name="keywords" content="chat,realtime chat,signalr,jabbr" />
-    <link href="/Content/images/logo32.png" rel="icon" type="image/png" sizes="32x32">
-    <link href="/Content/images/logo64.png" rel="icon" type="image/png" sizes="64x64">
-    <link href="/favicon.ico" rel="shortcut icon" type="image/x-icon" sizes="16x16">
+    <link href="Content/images/logo32.png" rel="icon" type="image/png" sizes="32x32">
+    <link href="Content/images/logo64.png" rel="icon" type="image/png" sizes="64x64">
+    <link href="favicon.ico" rel="shortcut icon" type="image/x-icon" sizes="16x16">
     <%= Bundle.Css()
             .Add("~/Chat.css")
             .Add("~/Chat.nuget.css")
@@ -376,21 +376,21 @@
     </section>
   </section> 
   <%= Bundle.JavaScript()
-            .Add("~/Scripts/jquery-1.8.0.min.js")
-            .Add("~/Scripts/json2.min.js")
+            .AddMinified("~/Scripts/jquery-1.8.0.min.js")
+            .AddMinified("~/Scripts/json2.min.js")
             .Add("~/Scripts/bootstrap.js")
             .Add("~/Scripts/jquery.KeyTips.js")
-            .Add("~/Scripts/jquery-ui-1.8.22.min.js")
-            .Add("~/Scripts/jquery.signalR-1.0.0-alpha2.min.js")
+            .AddMinified("~/Scripts/jquery-ui-1.8.22.min.js")
+            .AddMinified("~/Scripts/jquery.signalR-1.0.0-alpha2.min.js")
             .Render("~/Scripts/JabbR1_#.js")
   %>
   <script type="text/javascript" src='<%= ResolveClientUrl("~/signalr/hubs") %>'></script>
   <%= Bundle.JavaScript()
-            .Add("~/Scripts/jQuery.tmpl.min.js")
+            .AddMinified("~/Scripts/jQuery.tmpl.min.js")
             .Add("~/Scripts/jquery.cookie.js")
             .Add("~/Scripts/jquery.autotabcomplete.js")
             .Add("~/Scripts/jquery.timeago.0.10.js")
-            .Add("~/Scripts/jquery.captureDocumentWrite.min.js")
+            .AddMinified("~/Scripts/jquery.captureDocumentWrite.min.js")
             .Add("~/Scripts/jquery.sortElements.js")
             .Add("~/Scripts/quicksilver.js")
             .Add("~/Scripts/jquery.livesearch.js")

@@ -849,7 +849,7 @@
             else {
                 $richness.css({ left: '55px' });
                 $downloadIcon.css({ left: '90px' });
-                $emotelist.css({ left: '92px' });
+                $emotelist.css({ left: '118px' });
                 // We need to set the toast setting to false
                 preferences.canToast = false;
             }

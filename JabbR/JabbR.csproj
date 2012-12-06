@@ -753,10 +753,6 @@
     <Content Include="Content\images\v4c\zgo.gif" />
     <Content Include="Content\images\v4c\zgobz.jpg" />
     <Content Include="Content\images\v4c\ztop.gif" />
-    <Content Include="Content\jquery.mobile-1.0rc2.css" />
-    <Content Include="Content\jquery.mobile-1.0rc2.min.css" />
-    <Content Include="Content\jquery.mobile.structure-1.0rc2.css" />
-    <Content Include="Content\jquery.mobile.structure-1.0rc2.min.css" />
     <Content Include="Content\jquery.mobile-1.1.1.css" />
     <Content Include="Content\jquery.mobile-1.1.1.min.css" />
     <Content Include="Content\jquery.mobile.structure-1.1.1.css" />
@@ -1187,7 +1183,7 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
+          <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>16207</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
