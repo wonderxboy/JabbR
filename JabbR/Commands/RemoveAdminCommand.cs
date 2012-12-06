@@ -4,7 +4,8 @@ using JabbR.Models;
 
 namespace JabbR.Commands
 {
-    [Command("removeadmin", "Type /removeadmin [user] to remove admin status. Only administrators can use this command.")]
+     //Type /removeadmin [user] to remove admin status. Only administrators can use this command.
+    [Command("removeadmin", "", "", "")]
     public class RemoveAdminCommand : UserCommand
     {
         public override void Execute(CommandContext context, CallerContext callerContext, ChatUser callingUser, string[] args)

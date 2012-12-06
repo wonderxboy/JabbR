@@ -1,7 +1,8 @@
 ﻿/// <reference path="Scripts/jquery-1.7.js" />
 /// <reference path="Scripts/jQuery.tmpl.js" />
 /// <reference path="Scripts/jquery.cookie.js" />
-
+/*jshint evil:true*/
+/*global Emoji:true, Markdown:true */
 (function ($, window) {
     "use strict";
 
@@ -35,7 +36,7 @@
     $.fn.expandableContent = function () {
         // These are selectors to various rich content that may increase the
         // scrollable area after they were initially appended
-        var selectors = ['img'];
+        var selectors = ['img:not(.gravatar)'];
 
         return this.find(selectors.join(','));
     };
@@ -75,7 +76,7 @@
             ap = "PM";
         }
 
-        if (hr == 0) {
+        if (hr === 0) {
             hr = 12;
         }
 
@@ -85,8 +86,7 @@
 
         var mins = padZero(this.getMinutes());
         var seconds = padZero(this.getSeconds());
-        return hr + ":" + mins + ":" + seconds
-            + (showAp ? " " + ap : "");
+        return hr + ":" + mins + ":" + seconds + (showAp ? " " + ap : "");
     };
 
     // returns the date portion only (strips time)
@@ -99,7 +99,12 @@
         var t1 = this.getTime(),
             t2 = d.getTime();
 
-        return parseInt((t1 - t2) / (24 * 3600 * 1000));
+        return parseInt((t1 - t2) / (24 * 3600 * 1000), 10);
+    };
+
+    // adds a certain number of days to a Date object
+    Date.prototype.addDays = function (days) {
+        return new Date(this.getTime() + 1000 * 3600 * 24 * days);
     };
 
     // adds a certain number of days to a Date object

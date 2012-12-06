@@ -4,7 +4,7 @@ using JabbR.Models;
 
 namespace JabbR.Commands
 {
-    [Command("create", "Type /create [room] to create a room")]
+    [Command("create", "Create a room.", "room", "room")]
     public class CreateCommand : UserCommand
     {
         public override void Execute(CommandContext context, CallerContext callerContext, ChatUser callingUser, string[] args)

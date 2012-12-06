@@ -11,13 +11,13 @@ using JabbR.Infrastructure;
 using JabbR.Models;
 using JabbR.Services;
 using JabbR.ViewModels;
+using Microsoft.AspNet.SignalR.Hubs;
 using Newtonsoft.Json;
-using SignalR.Hubs;
 using System.Security.Principal;
 
 namespace JabbR
 {
-    public class Chat : Hub, IDisconnect, INotificationService
+    public class Chat : Hub, INotificationService
     {
         private readonly IJabbrRepository _repository;
         private readonly IChatService _service;
@@ -53,7 +53,7 @@ namespace JabbR
         {
             get
             {
-                string version = Caller.version;
+                string version = Clients.Caller.version;
                 return String.IsNullOrEmpty(version) ||
                         new Version(version) != _version;
             }
@@ -119,7 +119,7 @@ namespace JabbR
         private void SetVersion()
         {
             // Set the version on the client
-            Caller.version = _versionString;
+            Clients.Caller.version = _versionString;
         }
 
         public bool CheckStatus()
@@ -127,37 +127,6 @@ namespace JabbR
             bool outOfSync = OutOfSync;
 
             SetVersion();
-
-            string id = Caller.id;
-
-            ChatUser user = _repository.VerifyUserId(id);
-
-            // Make sure this client is being tracked
-            _service.AddClient(user, Context.ConnectionId, UserAgent);
-
-            var currentStatus = (UserStatus)user.Status;
-
-            if (currentStatus == UserStatus.Offline)
-            {
-                // Mark the user as inactive
-                user.Status = (int)UserStatus.Inactive;
-                _repository.CommitChanges();
-
-                // If the user was offline that means they are not in the user list so we need to tell
-                // everyone the user is really in the room
-                var userViewModel = new UserViewModel(user);
-
-                foreach (var room in user.Rooms)
-                {
-                    var isOwner = user.OwnedRooms.Contains(room);
-
-                    // Tell the people in this room that you've joined
-                    Clients[room.Name].addUser(userViewModel, room.Name, isOwner).Wait();
-
-                    // Add the caller to the group so they receive messages
-                    Groups.Add(Context.ConnectionId, room.Name).Wait();
-                }
-            }
 
             return outOfSync;
         }
@@ -168,7 +137,7 @@ namespace JabbR
             if (user.Rooms.Any(room => room.Name.Equals(clientState.ActiveRoom, StringComparison.OrdinalIgnoreCase)))
             {
                 // Update the active room on the client (only if it's still a valid room)
-                Caller.activeRoom = clientState.ActiveRoom;
+                Clients.Caller.activeRoom = clientState.ActiveRoom;
             }
 
             LogOn(user, Context.ConnectionId);
@@ -201,7 +170,7 @@ namespace JabbR
                 return outOfSync;
             }
 
-            string id = Caller.id;
+            string id = GetUserId();
 
             ChatUser user = _repository.VerifyUserId(id);
             ChatRoom room = _repository.VerifyUserRoom(_cache, user, message.Room);
@@ -224,7 +193,7 @@ namespace JabbR
 
 
             var messageViewModel = new MessageViewModel(chatMessage);
-            Clients[room.Name].addMessage(messageViewModel, room.Name);
+            Clients.Group(room.Name).addMessage(messageViewModel, room.Name);
 
             _repository.CommitChanges();
 
@@ -253,41 +222,81 @@ namespace JabbR
 
         public UserViewModel GetUserInfo()
         {
-            string id = Caller.id;
+            string id = GetUserId();
 
             ChatUser user = _repository.VerifyUserId(id);
 
             return new UserViewModel(user);
         }
 
-        public Task Disconnect()
+        public override Task OnReconnected()
+        {
+            string id = GetUserId();
+
+            if (String.IsNullOrEmpty(id))
+            {
+                return null;
+            }
+
+            ChatUser user = _repository.VerifyUserId(id);
+
+            // Make sure this client is being tracked
+            _service.AddClient(user, Context.ConnectionId, UserAgent);
+
+            var currentStatus = (UserStatus)user.Status;
+
+            if (currentStatus == UserStatus.Offline)
+            {
+                // Mark the user as inactive
+                user.Status = (int)UserStatus.Inactive;
+                _repository.CommitChanges();
+
+                // If the user was offline that means they are not in the user list so we need to tell
+                // everyone the user is really in the room
+                var userViewModel = new UserViewModel(user);
+
+                foreach (var room in user.Rooms)
+                {
+                    var isOwner = user.OwnedRooms.Contains(room);
+
+                    // Tell the people in this room that you've joined
+                    Clients.Group(room.Name).addUser(userViewModel, room.Name, isOwner).Wait();
+
+                    // Add the caller to the group so they receive messages
+                    Groups.Add(Context.ConnectionId, room.Name).Wait();
+                }
+            }
+
+            return base.OnReconnected();
+        }
+
+        public override Task OnDisconnected()
         {
             DisconnectClient(Context.ConnectionId);
 
-            return null;
+            return base.OnDisconnected();
         }
 
         public object GetCommands()
         {
-            // Could stash this in a static field for re-use
-            return from c in CommandManager.Commands
-                   let commandAttribute = c.GetType()
-                                           .GetCustomAttributes(true)
-                                           .OfType<CommandAttribute>()
-                                           .FirstOrDefault()
-                   where commandAttribute != null
-                   orderby commandAttribute.CommandName ascending
-                   select new { Name = commandAttribute.CommandName, Description = commandAttribute.Description };
-
-            //"roomname" Type #roomname to add a link to that room in your message. Eg. If you add \"#meta\" to your message it will be replaced with a link to /#/rooms/meta.
+            return CommandManager.GetCommandsMetaData();
         }
 
-        public IEnumerable<RoomViewModel> GetRooms()
+        public object GetShortcuts()
         {
-            string id = Caller.id;
+            return new[] {
+                new { Name = "Tab or Shift + Tab", Category = "shortcut", Description = "Go to the next open room tab or Go to the previous open room tab." },
+                new { Name = "Alt + L", Category = "shortcut", Description = "Go to the Lobby."},
+                new { Name = "Alt + Number", Category = "shortcut", Description = "Go to specific Tab."}
+            };
+        }
+
+        public IEnumerable<LobbyRoomViewModel> GetRooms()
+        {
+            string id = GetUserId();
             ChatUser user = _repository.VerifyUserId(id);
 
-            var rooms = _repository.GetAllowedRooms(user).Select(r => new RoomViewModel
+            var rooms = _repository.GetAllowedRooms(user).Select(r => new LobbyRoomViewModel
             {
                 Name = r.Name,
                 Count = r.Users.Count(u => u.Status != (int)UserStatus.Offline),
@@ -359,14 +368,14 @@ namespace JabbR
         // TODO: Deprecate
         public void Typing()
         {
-            string roomName = Caller.activeRoom;
+            string roomName = Clients.Caller.activeRoom;
 
             Typing(roomName);
         }
 
         public void Typing(string roomName)
         {
-            string id = Caller.id;
+            string id = GetUserId();
             ChatUser user = _repository.GetUserById(id);
 
             if (user == null)
@@ -379,16 +388,16 @@ namespace JabbR
             UpdateActivity(user, room);
 
             var userViewModel = new UserViewModel(user);
-            Clients[room.Name].setTyping(userViewModel, room.Name);
+            Clients.Group(room.Name).setTyping(userViewModel, room.Name);
         }
 
         private void LogOn(ChatUser user, string clientId)
         {
             // Update the client state
-            Caller.id = user.Id;
-            Caller.name = user.Name;
-            Caller.hash = user.Hash;
-            Caller.employeeId = user.EmployeeId;
+            Clients.Caller.id = user.Id;
+            Clients.Caller.name = user.Name;
+            Clients.Caller.hash = user.Hash;
+            Clients.Caller.employeeId = user.EmployeeId;
 
             var userViewModel = new UserViewModel(user);
             var rooms = new List<RoomViewModel>();
@@ -400,7 +409,7 @@ namespace JabbR
                 var isOwner = ownedRooms.Contains(room.Key);
 
                 // Tell the people in this room that you've joined
-                Clients[room.Name].addUser(userViewModel, room.Name, isOwner).Wait();
+                Clients.Group(room.Name).addUser(userViewModel, room.Name, isOwner).Wait();
 
                 // Add the caller to the group so they receive messages
                 Groups.Add(clientId, room.Name).Wait();
@@ -415,7 +424,7 @@ namespace JabbR
             }
 
             // Initialize the chat with the rooms the user is in
-            Caller.logOn(rooms);
+            Clients.Caller.logOn(rooms);
         }
 
         private void UpdateActivity(ChatUser user, ChatRoom room)
@@ -454,7 +463,7 @@ namespace JabbR
                     string extractedContent = "<p>" + task.Result.Content + "</p>";
 
                     // Notify the room
-                    Clients[roomName].addMessageContent(clientMessageId, extractedContent, roomName);
+                    Clients.Group(roomName).addMessageContent(clientMessageId, extractedContent, roomName);
 
                     _service.AppendMessage(messageId, extractedContent);
                 }
@@ -464,7 +473,7 @@ namespace JabbR
         private bool TryHandleCommand(string command, string room)
         {
             string clientId = Context.ConnectionId;
-            string userId = Caller.id;
+            string userId = GetUserId();
 
             var commandManager = new CommandManager(clientId, UserAgent, userId, room, _service, _repository, _cache, this);
             return commandManager.TryHandleCommand(command);
@@ -472,11 +481,15 @@ namespace JabbR
 
         private void DisconnectClient(string clientId)
         {
-            // Sleep a little so that a browser refresh doesn't show the user 
-            // coming offline and back online
-            Thread.Sleep(500);
+            string userId = _service.DisconnectClient(clientId);
 
-            ChatUser user = _service.DisconnectClient(clientId);
+            if (String.IsNullOrEmpty(userId))
+            {
+                return;
+            }
+
+            // Query for the user to get the updated status
+            ChatUser user = _repository.GetUserById(userId);
 
             // There's no associated user for this client id
             if (user == null)
@@ -491,7 +504,7 @@ namespace JabbR
                 {
                     var userViewModel = new UserViewModel(user);
 
-                    Clients[room.Name].leave(userViewModel, room.Name).Wait();
+                    Clients.Group(room.Name).leave(userViewModel, room.Name).Wait();
                 }
             }
         }
@@ -499,13 +512,13 @@ namespace JabbR
         private void OnUpdateActivity(ChatUser user, ChatRoom room)
         {
             var userViewModel = new UserViewModel(user);
-            Clients[room.Name].updateActivity(userViewModel, room.Name);
+            Clients.Group(room.Name).updateActivity(userViewModel, room.Name);
         }
 
         private void LeaveRoom(ChatUser user, ChatRoom room)
         {
             var userViewModel = new UserViewModel(user);
-            Clients[room.Name].leave(userViewModel, room.Name).Wait();
+            Clients.Group(room.Name).leave(userViewModel, room.Name).Wait();
 
             foreach (var client in user.ConnectedClients)
             {
@@ -522,12 +535,12 @@ namespace JabbR
 
         void INotificationService.ChangePassword()
         {
-            Caller.changePassword();
+            Clients.Caller.changePassword();
         }
 
         void INotificationService.SetPassword()
         {
-            Caller.setPassword();
+            Clients.Caller.setPassword();
         }
 
         void INotificationService.KickUser(ChatUser targetUser, ChatRoom room)
@@ -535,7 +548,7 @@ namespace JabbR
             foreach (var client in targetUser.ConnectedClients)
             {
                 // Kick the user from this room
-                Clients[client.Id].kick(room.Name);
+                Clients.Client(client.Id).kick(room.Name);
 
                 // Remove the user from this the room group so he doesn't get the leave message
                 Groups.Remove(client.Id, room.Name).Wait();
@@ -548,12 +561,12 @@ namespace JabbR
         void INotificationService.OnUserCreated(ChatUser user)
         {
             // Set some client state
-            Caller.name = user.Name;
-            Caller.id = user.Id;
-            Caller.hash = user.Hash;
+            Clients.Caller.name = user.Name;
+            Clients.Caller.id = user.Id;
+            Clients.Caller.hash = user.Hash;
 
             // Tell the client a user was created
-            Caller.userCreated();
+            Clients.Caller.userCreated();
         }
 
         void INotificationService.JoinRoom(ChatUser user, ChatRoom room)
@@ -572,11 +585,11 @@ namespace JabbR
             // Tell all clients to join this room
             foreach (var client in user.ConnectedClients)
             {
-                Clients[client.Id].joinRoom(roomViewModel);
+                Clients.Client(client.Id).joinRoom(roomViewModel);
             }
 
             // Tell the people in this room that you've joined
-            Clients[room.Name].addUser(userViewModel, room.Name, isOwner).Wait();
+            Clients.Group(room.Name).addUser(userViewModel, room.Name, isOwner).Wait();
 
             // Notify users of the room count change
             OnRoomChanged(room);
@@ -593,11 +606,11 @@ namespace JabbR
             foreach (var client in targetUser.ConnectedClients)
             {
                 // Tell this client it's an owner
-                Clients[client.Id].allowUser(targetRoom.Name);
+                Clients.Client(client.Id).allowUser(targetRoom.Name);
             }
 
             // Tell the calling client the granting permission into the room was successful
-            Caller.userAllowed(targetUser.Name, targetRoom.Name);
+            Clients.Caller.userAllowed(targetUser.Name, targetRoom.Name);
         }
 
         void INotificationService.UnallowUser(ChatUser targetUser, ChatRoom targetRoom)
@@ -608,11 +621,11 @@ namespace JabbR
             foreach (var client in targetUser.ConnectedClients)
             {
                 // Tell this client it's an owner
-                Clients[client.Id].unallowUser(targetRoom.Name);
+                Clients.Client(client.Id).unallowUser(targetRoom.Name);
             }
 
             // Tell the calling client the granting permission into the room was successful
-            Caller.userUnallowed(targetUser.Name, targetRoom.Name);
+            Clients.Caller.userUnallowed(targetUser.Name, targetRoom.Name);
         }
 
         void INotificationService.AddOwner(ChatUser targetUser, ChatRoom targetRoom)
@@ -620,7 +633,7 @@ namespace JabbR
             foreach (var client in targetUser.ConnectedClients)
             {
                 // Tell this client it's an owner
-                Clients[client.Id].makeOwner(targetRoom.Name);
+                Clients.Client(client.Id).makeOwner(targetRoom.Name);
             }
 
             var userViewModel = new UserViewModel(targetUser);
@@ -629,11 +642,11 @@ namespace JabbR
             // Tell everyone in the target room that a new owner was added
             if (_repository.IsUserInRoom(_cache, targetUser, targetRoom))
             {
-                Clients[targetRoom.Name].addOwner(userViewModel, targetRoom.Name);
+                Clients.Group(targetRoom.Name).addOwner(userViewModel, targetRoom.Name);
             }
 
             // Tell the calling client the granting of ownership was successful
-            Caller.ownerMade(targetUser.Name, targetRoom.Name);
+            Clients.Caller.ownerMade(targetUser.Name, targetRoom.Name);
         }
 
         void INotificationService.RemoveOwner(ChatUser targetUser, ChatRoom targetRoom)
@@ -641,7 +654,7 @@ namespace JabbR
             foreach (var client in targetUser.ConnectedClients)
             {
                 // Tell this client it's no longer an owner
-                Clients[client.Id].demoteOwner(targetRoom.Name);
+                Clients.Client(client.Id).demoteOwner(targetRoom.Name);
             }
 
             var userViewModel = new UserViewModel(targetUser);
@@ -650,21 +663,21 @@ namespace JabbR
             // Tell everyone in the target room that the owner was removed
             if (_repository.IsUserInRoom(_cache, targetUser, targetRoom))
             {
-                Clients[targetRoom.Name].removeOwner(userViewModel, targetRoom.Name);
+                Clients.Group(targetRoom.Name).removeOwner(userViewModel, targetRoom.Name);
             }
 
             // Tell the calling client the removal of ownership was successful
-            Caller.ownerRemoved(targetUser.Name, targetRoom.Name);
+            Clients.Caller.ownerRemoved(targetUser.Name, targetRoom.Name);
         }
 
         void INotificationService.ChangeGravatar(ChatUser user)
         {
-            Caller.hash = user.Hash;
+            Clients.Caller.hash = user.Hash;
 
             // Update the calling client
             foreach (var client in user.ConnectedClients)
             {
-                Clients[client.Id].gravatarChanged();
+                Clients.Client(client.Id).gravatarChanged();
             }
 
             // Create the view model
@@ -673,13 +686,13 @@ namespace JabbR
             // Tell all users in rooms to change the gravatar
             foreach (var room in user.Rooms)
             {
-                Clients[room.Name].changeGravatar(userViewModel, room.Name);
+                Clients.Group(room.Name).changeGravatar(userViewModel, room.Name);
             }
         }
 
         void INotificationService.OnSelfMessage(ChatRoom room, ChatUser user, string content)
         {
-            Clients[room.Name].sendMeMessage(user.Name, content, room.Name);
+            Clients.Group(room.Name).sendMeMessage(user.Name, content, room.Name);
         }
 
         void INotificationService.SendPrivateMessage(ChatUser fromUser, ChatUser toUser, string messageText)
@@ -687,12 +700,12 @@ namespace JabbR
             // Send a message to the sender and the sendee
             foreach (var client in fromUser.ConnectedClients)
             {
-                Clients[client.Id].sendPrivateMessage(fromUser.Name, toUser.Name, messageText);
+                Clients.Client(client.Id).sendPrivateMessage(fromUser.Name, toUser.Name, messageText);
             }
 
             foreach (var client in toUser.ConnectedClients)
             {
-                Clients[client.Id].sendPrivateMessage(fromUser.Name, toUser.Name, messageText);
+                Clients.Client(client.Id).sendPrivateMessage(fromUser.Name, toUser.Name, messageText);
             }
         }
 
@@ -700,32 +713,32 @@ namespace JabbR
         {
             foreach (var client in user.ConnectedClients)
             {
-                Clients[client.Id].postNotification(message, room.Name);
+                Clients.Client(client.Id).postNotification(message, room.Name);
             }
         }
 
         void INotificationService.ListRooms(ChatUser user)
         {
-            string userId = Caller.id;
+            string userId = GetUserId();
             var userModel = new UserViewModel(user);
 
-            Caller.showUsersRoomList(userModel, user.Rooms.Allowed(userId).Select(r => r.Name));
+            Clients.Caller.showUsersRoomList(userModel, user.Rooms.Allowed(userId).Select(r => r.Name));
         }
 
         void INotificationService.ListUsers()
         {
             var users = _repository.Users.Online().Select(s => s.Name).OrderBy(s => s);
-            Caller.listUsers(users);
+            Clients.Caller.listUsers(users);
         }
 
         void INotificationService.ListUsers(IEnumerable<ChatUser> users)
         {
-            Caller.listUsers(users.Select(s => s.Name));
+            Clients.Caller.listUsers(users.Select(s => s.Name));
         }
 
         void INotificationService.ListUsers(ChatRoom room, IEnumerable<string> names)
         {
-            Caller.showUsersInRoom(room.Name, names);
+            Clients.Caller.showUsersInRoom(room.Name, names);
         }
 
         void INotificationService.LockRoom(ChatUser targetUser, ChatRoom room)
@@ -733,10 +746,10 @@ namespace JabbR
             var userViewModel = new UserViewModel(targetUser);
 
             // Tell the room it's locked
-            Clients.lockRoom(userViewModel, room.Name);
+            Clients.All.lockRoom(userViewModel, room.Name);
 
             // Tell the caller the room was successfully locked
-            Caller.roomLocked(room.Name);
+            Clients.Caller.roomLocked(room.Name);
 
             // Notify people of the change
             OnRoomChanged(room);
@@ -749,11 +762,11 @@ namespace JabbR
             {
                 foreach (var client in user.ConnectedClients)
                 {
-                    Clients[client.Id].roomClosed(room.Name);
+                    Clients.Client(client.Id).roomClosed(room.Name);
                 }
             }
         }
-
+        //TODO fix this method
         void INotificationService.DeleteRoom(IEnumerable<ChatUser> users, ChatRoom room)
         {
             // notify all members of room that it is now deleted
@@ -778,7 +791,7 @@ namespace JabbR
             {
                 foreach (var client in user.ConnectedClients)
                 {
-                    Clients[client.Id].roomUnClosed(room.Name);
+                    Clients.Client(client.Id).roomUnClosed(room.Name);
                 }
             }
         }
@@ -789,14 +802,14 @@ namespace JabbR
 
             var rooms = user.Rooms.Select(r => r.Name);
 
-            Caller.logOut(rooms);
+            Clients.Caller.logOut(rooms);
         }
 
         void INotificationService.ShowUserInfo(ChatUser user)
         {
-            string userId = Caller.id;
+            string userId = GetUserId();
 
-            Caller.showUserInfo(new
+            Clients.Caller.showUserInfo(new
             {
                 Name = user.Name,
                 OwnedRooms = user.OwnedRooms
@@ -815,7 +828,7 @@ namespace JabbR
 
         void INotificationService.ShowHelp()
         {
-            Caller.showCommands();
+            Clients.Caller.showCommands();
         }
 
         void INotificationService.Invite(ChatUser user, ChatUser targetUser, ChatRoom targetRoom)
@@ -826,13 +839,13 @@ namespace JabbR
             // Send the invite message to the sendee
             foreach (var client in targetUser.ConnectedClients)
             {
-                Clients[client.Id].sendInvite(user.Name, targetUser.Name, roomLink);
+                Clients.Client(client.Id).sendInvite(user.Name, targetUser.Name, roomLink);
             }
 
             // Send the invite notification to the sender
             foreach (var client in user.ConnectedClients)
             {
-                Clients[client.Id].sendInvite(user.Name, targetUser.Name, roomLink);
+                Clients.Client(client.Id).sendInvite(user.Name, targetUser.Name, roomLink);
             }
         }
 
@@ -841,18 +854,18 @@ namespace JabbR
             // Send a nudge message to the sender and the sendee
             foreach (var client in targetUser.ConnectedClients)
             {
-                Clients[client.Id].nudge(user.Name, targetUser.Name);
+                Clients.Client(client.Id).nudge(user.Name, targetUser.Name);
             }
 
             foreach (var client in user.ConnectedClients)
             {
-                Clients[client.Id].sendPrivateMessage(user.Name, targetUser.Name, "nudged " + targetUser.Name);
+                Clients.Client(client.Id).sendPrivateMessage(user.Name, targetUser.Name, "nudged " + targetUser.Name);
             }
         }
 
         void INotificationService.NudgeRoom(ChatRoom room, ChatUser user)
         {
-            Clients[room.Name].nudge(user.Name);
+            Clients.Group(room.Name).nudge(user.Name);
         }
 
         void INotificationService.LeaveRoom(ChatUser user, ChatRoom room)
@@ -868,13 +881,13 @@ namespace JabbR
             // Tell the user's connected clients that the name changed
             foreach (var client in user.ConnectedClients)
             {
-                Clients[client.Id].userNameChanged(userViewModel);
+                Clients.Client(client.Id).userNameChanged(userViewModel);
             }
 
             // Notify all users in the rooms
             foreach (var room in user.Rooms)
             {
-                Clients[room.Name].changeUserName(oldUserName, userViewModel, room.Name);
+                Clients.Group(room.Name).changeUserName(oldUserName, userViewModel, room.Name);
             }
         }
 
@@ -885,7 +898,7 @@ namespace JabbR
             // Update the calling client
             foreach (var client in user.ConnectedClients)
             {
-                Clients[client.Id].noteChanged(user.IsAfk, isNoteCleared);
+                Clients.Client(client.Id).noteChanged(user.IsAfk, isNoteCleared);
             }
 
             // Create the view model
@@ -894,7 +907,7 @@ namespace JabbR
             // Tell all users in rooms to change the note
             foreach (var room in user.Rooms)
             {
-                Clients[room.Name].changeNote(userViewModel, room.Name);
+                Clients.Group(room.Name).changeNote(userViewModel, room.Name);
             }
         }
 
@@ -908,13 +921,13 @@ namespace JabbR
             // Update the calling client
             foreach (var client in user.ConnectedClients)
             {
-                Clients[client.Id].flagChanged(isFlagCleared, userViewModel.Country);
+                Clients.Client(client.Id).flagChanged(isFlagCleared, userViewModel.Country);
             }
 
             // Tell all users in rooms to change the flag
             foreach (var room in user.Rooms)
             {
-                Clients[room.Name].changeFlag(userViewModel, room.Name);
+                Clients.Group(room.Name).changeFlag(userViewModel, room.Name);
             }
         }
 
@@ -922,10 +935,7 @@ namespace JabbR
         {
             bool isTopicCleared = String.IsNullOrWhiteSpace(room.Topic);
             var parsedTopic = ConvertUrlsAndRoomLinks(room.Topic ?? "");
-            foreach (var client in user.ConnectedClients)
-            {
-                Clients[client.Id].topicChanged(isTopicCleared, parsedTopic);
-            }
+            Clients.Group(room.Name).topicChanged(room.Name, isTopicCleared, parsedTopic, user.Name);
             // Create the view model
             var roomViewModel = new RoomViewModel
             {
@@ -933,15 +943,16 @@ namespace JabbR
                 Topic = parsedTopic,
                 Closed = room.Closed
             };
-            Clients[room.Name].changeTopic(roomViewModel);
+            Clients.Group(room.Name).changeTopic(roomViewModel);
         }
 
         void INotificationService.ChangeWelcome(ChatUser user, ChatRoom room)
         {
             bool isWelcomeCleared = String.IsNullOrWhiteSpace(room.Welcome);
             var parsedWelcome = ConvertUrlsAndRoomLinks(room.Welcome ?? "");
-            foreach (var client in user.ConnectedClients) {
-                Clients[client.Id].welcomeChanged(isWelcomeCleared, parsedWelcome);
+            foreach (var client in user.ConnectedClients)
+            {
+                Clients.Client(client.Id).welcomeChanged(isWelcomeCleared, parsedWelcome);
             }
         }
 
@@ -950,7 +961,7 @@ namespace JabbR
             foreach (var client in targetUser.ConnectedClients)
             {
                 // Tell this client it's an owner
-                Clients[client.Id].makeAdmin();
+                Clients.Client(client.Id).makeAdmin();
             }
 
             var userViewModel = new UserViewModel(targetUser);
@@ -958,11 +969,11 @@ namespace JabbR
             // Tell all users in rooms to change the admin status
             foreach (var room in targetUser.Rooms)
             {
-                Clients[room.Name].addAdmin(userViewModel, room.Name);
+                Clients.Group(room.Name).addAdmin(userViewModel, room.Name);
             }
 
             // Tell the calling client the granting of admin status was successful
-            Caller.adminMade(targetUser.Name);
+            Clients.Caller.adminMade(targetUser.Name);
         }
 
         void INotificationService.RemoveAdmin(ChatUser targetUser)
@@ -970,7 +981,7 @@ namespace JabbR
             foreach (var client in targetUser.ConnectedClients)
             {
                 // Tell this client it's no longer an owner
-                Clients[client.Id].demoteAdmin();
+                Clients.Client(client.Id).demoteAdmin();
             }
 
             var userViewModel = new UserViewModel(targetUser);
@@ -978,11 +989,11 @@ namespace JabbR
             // Tell all users in rooms to change the admin status
             foreach (var room in targetUser.Rooms)
             {
-                Clients[room.Name].removeAdmin(userViewModel, room.Name);
+                Clients.Group(room.Name).removeAdmin(userViewModel, room.Name);
             }
 
             // Tell the calling client the removal of admin status was successful
-            Caller.adminRemoved(targetUser.Name);
+            Clients.Caller.adminRemoved(targetUser.Name);
         }
 
         void INotificationService.BroadcastMessage(ChatUser user, string messageText)
@@ -990,13 +1001,13 @@ namespace JabbR
             // Tell all users in all rooms about this message
             foreach (var room in _repository.Rooms)
             {
-                Clients[room.Name].broadcastMessage(messageText, room.Name);
+                Clients.Group(room.Name).broadcastMessage(messageText, room.Name);
             }
         }
 
         void INotificationService.ForceUpdate()
         {
-            Clients.forceUpdate();
+            Clients.All.forceUpdate();
         }
 
         private void OnRoomChanged(ChatRoom room)
@@ -1009,7 +1020,13 @@ namespace JabbR
             };
 
             // Update the room count
-            Clients.updateRoomCount(roomViewModel, _repository.GetOnlineUsers(room).Count());
+            Clients.All.updateRoomCount(roomViewModel, _repository.GetOnlineUsers(room).Count());
+        }
+
+        private string GetUserId()
+        {
+            ClientState state = GetClientState();
+            return state.UserId;
         }
 
         private ClientState GetClientState()
@@ -1029,7 +1046,7 @@ namespace JabbR
             }
 
             // Read the id from the caller if there's no cookie
-            clientState.UserId = clientState.UserId ?? Caller.id;
+            clientState.UserId = clientState.UserId ?? Clients.Caller.id;
 
             return clientState;
         }
@@ -1040,8 +1057,7 @@ namespace JabbR
             string value = cookie != null ? cookie.Value : null;
             return value != null ? HttpUtility.UrlDecode(value) : null;
         }
-
-        private Employee GetEmployee(string userId)
+	private Employee GetEmployee(string userId)
         {
             using (var context = new DirectoryContext())
             {
@@ -1072,6 +1088,31 @@ namespace JabbR
             {
                 return userName;
             }
+        }
+        
+        void INotificationService.BanUser(ChatUser targetUser)
+        {
+            var rooms = targetUser.Rooms.Select(x => x.Name);
+
+            foreach (var room in rooms)
+            {
+                foreach (var client in targetUser.ConnectedClients)
+                {
+                    // Kick the user from this room
+                    Clients.Client(client.Id).kick(room);
+
+                    // Remove the user from this the room group so he doesn't get the leave message
+                    Groups.Remove(client.Id, room).Wait();
+                }
+            }
+
+            Clients.Client(targetUser.ConnectedClients.First().Id).logOut(rooms);
+        }
+
+        public override void Dispose()
+        {
+            _repository.Dispose();
+
         }
     }
 }

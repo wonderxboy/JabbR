@@ -607,7 +607,7 @@ namespace JabbR.Services
             return client;
         }
 
-        public ChatUser DisconnectClient(string clientId)
+        public string DisconnectClient(string clientId)
         {
             // Remove this client from the list of user's clients
             ChatClient client = _repository.GetClientById(clientId, includeUser: true);
@@ -635,7 +635,7 @@ namespace JabbR.Services
                 _repository.CommitChanges();
             }
 
-            return user;
+            return user.Id;
         }
 
         private void EnsureUserNameIsAvailable(string userName)
@@ -949,6 +949,19 @@ namespace JabbR.Services
             _repository.CommitChanges();
         }
 
+        public void BanUser(ChatUser admin, ChatUser targetUser)
+        {
+            EnsureAdmin(admin);
+
+            if (targetUser.IsAdmin)
+            {
+                throw new InvalidOperationException("You cannot ban another Admin.");
+            }
+
+            targetUser.IsBanned = true;
+
+            _repository.CommitChanges();
+        }
 
         internal static void ValidateNote(string note, string noteTypeName = "note", int? maxLength = null)
         {
@@ -981,7 +994,7 @@ namespace JabbR.Services
                     "Sorry, but the country ISO code you requested doesn't exist. Please refer to http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2 for a proper list of country ISO codes.");
             }
         }
-
+         
         internal static string GetCountry(string isoCode)
         {
             if (String.IsNullOrEmpty(isoCode))

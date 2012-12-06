@@ -22,7 +22,7 @@
         pendingMessages = {};
 
     function isSelf(user) {
-        return chat.name === user.Name;
+        return chat.state.name === user.Name;
     }
 
     function getNoteCssClass(user) {
@@ -53,7 +53,7 @@
     function populateRoom(room) {
         var d = $.Deferred();
         // Populate the list of users rooms and messages 
-        chat.getRoomInfo(room)
+        chat.server.getRoomInfo(room)
                 .done(function (roomInfo) {
                     $.each(roomInfo.Users, function () {
                         var userViewModel = getUserViewModel(this);
@@ -78,21 +78,24 @@
                     // mark room as initialized to differentiate messages
                     // that are added after initial population
                     ui.setInitialized(room);
-                    ui.scrollToBottom(room);
-                    ui.watchMessageScroll(messageIds, room);
+                    ui.setRoomListStatuses(room);
 
                     d.resolveWith(chat);
+
+                    // Watch the messages after the defer, since room messages
+                    // may be appended if we are just joining the room
+                    ui.watchMessageScroll(messageIds, room);
                 })
                 .fail(function () {
                     d.rejectWith(chat);
                 });
 
-        return d;
+        return d.promise();
     }
 
     function populateLobbyRooms() {
         // Populate the user list with room names
-        chat.getRooms()
+        chat.server.getRooms()
             .done(function (rooms) {
                 ui.populateLobbyRooms(rooms);
             });
@@ -128,7 +131,7 @@
     }
 
     function getMessageViewModel(message) {
-        var re = new RegExp("\\b@?" + chat.name.replace(/\./, '\\.') + "\\b", "i");
+        var re = new RegExp("\\b@?" + chat.state.name.replace(/\./, '\\.') + "\\b", "i");
         var regt = new RegExp("^&gt;");
         return {
             name: message.User.Name,
@@ -146,8 +149,8 @@
     // Save some state in a cookie
     function updateCookie() {
         var state = {
-            userId: chat.id,
-            activeRoom: chat.activeRoom,
+            userId: chat.state.id,
+            activeRoom: chat.state.activeRoom,
             preferences: ui.getState()
         },
         jsonState = window.JSON.stringify(state);
@@ -156,17 +159,12 @@
     }
 
     function updateTitle() {
-        // ugly hack via http://stackoverflow.com/a/2952386/188039
-        window.setTimeout(function () {
-            if (unread === 0) {
-                document.title = originalTitle;
-            }
-            else {
-                document.title =
-                (isUnreadMessageForUser ? '*' : '')
-                + '(' + unread + ') ' + originalTitle;
-            }
-        }, 200);
+        if (unread === 0) {
+            document.title = originalTitle;
+        }
+        else {
+            document.title =  (isUnreadMessageForUser ? '*' : '') + '(' + unread + ') ' + originalTitle;
+        }
     }
 
     function updateUnread(room, isMentioned) {
@@ -188,7 +186,7 @@
     // Room commands
 
     // When the /join command gets raised this is called
-    chat.joinRoom = function (room) {
+    chat.client.joinRoom = function (room) {
         var added = ui.addRoom(room);
         ui.setActiveRoom(room.Name);
         if (room.Private) {
@@ -210,11 +208,11 @@
     };
 
     // Called when a returning users join chat
-    chat.logOn = function (rooms) {
-        var activeRoom = this.activeRoom,
+    chat.client.logOn = function (rooms) {
+        var activeRoom = this.state.activeRoom,
             loadRooms = function () {
                 $.each(rooms, function (index, room) {
-                    if (chat.activeRoom !== room.Name) {
+                    if (chat.state.activeRoom !== room.Name) {
                         populateRoom(room.Name);
                     }
                 });
@@ -230,8 +228,8 @@
                 ui.setRoomClosed(room.Name);
             }
         });
-        ui.setUserName(chat.name);
-        ui.addMessage('Welcome back ' + chat.name, 'notification', 'lobby');
+        ui.setUserName(chat.state.name);
+        ui.addMessage('Welcome back ' + chat.state.name, 'notification', 'lobby');
         ui.addMessage('You can join any of the rooms on the right', 'notification', 'lobby');
         ui.addMessage('Type /logout to log out of chat', 'notification', 'lobby');
 
@@ -239,13 +237,13 @@
         ui.run();
 
         // If the active room didn't change then set the active room (since no navigation happened)
-        if (activeRoom === this.activeRoom) {
-            ui.setActiveRoom(this.activeRoom || 'Lobby');
+        if (activeRoom === this.state.activeRoom) {
+            ui.setActiveRoom(this.state.activeRoom || 'Lobby');
         }
 
-        if (this.activeRoom) {
+        if (this.state.activeRoom) {
             // Always populate the active room first then load the other rooms so it looks fast :)
-            populateRoom(this.activeRoom).done(loadRooms);
+            populateRoom(this.state.activeRoom).done(loadRooms);
         }
         else {
             // There's no active room so we don't care
@@ -253,26 +251,26 @@
         }
     };
 
-    chat.lockRoom = function (user, room) {
-        if (!isSelf(user) && this.activeRoom === room) {
-            ui.addMessage(user.Name + ' has locked ' + room + '.', 'notification', this.activeRoom);
+    chat.client.lockRoom = function (user, room) {
+        if (!isSelf(user) && this.state.activeRoom === room) {
+            ui.addMessage(user.Name + ' has locked ' + room + '.', 'notification', this.state.activeRoom);
         }
 
         ui.setRoomLocked(room);
     };
 
     // Called when this user locked a room
-    chat.roomLocked = function (room) {
-        ui.addMessage(room + ' is now locked.', 'notification', this.activeRoom);
+    chat.client.roomLocked = function (room) {
+        ui.addMessage(room + ' is now locked.', 'notification', this.state.activeRoom);
     };
 
-    chat.roomClosed = function (room) {
+    chat.client.roomClosed = function (room) {
         populateLobbyRooms();
-        ui.addMessage('Room \'' + room + '\' is now closed', 'notification', this.activeRoom);
+        ui.addMessage('Room \'' + room + '\' is now closed', 'notification', this.state.activeRoom);
 
         ui.closeRoom(room);
 
-        if (this.activeRoom === room) {
+        if (this.state.activeRoom === room) {
             ui.toggleMessageSection(true);
         }
     };
@@ -288,20 +286,20 @@
 
     chat.roomUnClosed = function (room) {
         populateLobbyRooms();
-        ui.addMessage('Room \'' + room + '\' is now open', 'notification', this.activeRoom);
+        ui.addMessage('Room \'' + room + '\' is now open', 'notification', this.state.activeRoom);
 
         ui.unCloseRoom(room);
 
-        if (this.activeRoom === room) {
+        if (this.state.activeRoom === room) {
             ui.toggleMessageSection(false);
         }
     };
 
-    chat.addOwner = function (user, room) {
+    chat.client.addOwner = function (user, room) {
         ui.setRoomOwner(user.Name, room);
     };
 
-    chat.removeOwner = function (user, room) {
+    chat.client.removeOwner = function (user, room) {
         ui.clearRoomOwner(user.Name, room);
     };
 
@@ -309,19 +307,19 @@
         ui.updateLobbyRoomCount(room, count);
     };
 
-    chat.markInactive = function (users) {
+    chat.client.markInactive = function (users) {
         $.each(users, function () {
             var viewModel = getUserViewModel(this);
             ui.setUserActivity(viewModel);
         });
     };
 
-    chat.updateActivity = function (user) {
+    chat.client.updateActivity = function (user) {
         var viewModel = getUserViewModel(user);
         ui.setUserActivity(viewModel);
     };
 
-    chat.addMessageContent = function (id, content, room) {
+    chat.client.addMessageContent = function (id, content, room) {
         scrollIfNecessary(function () {
             ui.addChatMessageContent(id, content, room);
         }, room);
@@ -331,7 +329,7 @@
         ui.watchMessageScroll([id], room);
     };
 
-    chat.addMessage = function (message, room) {
+    chat.client.addMessage = function (message, room) {
         var viewModel = getMessageViewModel(message);
 
         scrollIfNecessary(function () {
@@ -348,7 +346,7 @@
         updateUnread(room, isMentioned);
     };
 
-    chat.addUser = function (user, room, isOwner) {
+    chat.client.addUser = function (user, room, isOwner) {
         var viewModel = getUserViewModel(user, isOwner);
 
         var added = ui.addUser(viewModel, room);
@@ -360,7 +358,7 @@
         }
     };
 
-    chat.changeUserName = function (oldName, user, room) {
+    chat.client.changeUserName = function (oldName, user, room) {
         ui.changeUserName(oldName, user, room);
 
         if (!isSelf(user)) {
@@ -368,7 +366,7 @@
         }
     };
 
-    chat.changeGravatar = function (user, room) {
+    chat.client.changeGravatar = function (user, room) {
         ui.changeGravatar(user, room);
 
         if (!isSelf(user)) {
@@ -378,60 +376,60 @@
 
     // User single client commands
 
-    chat.allowUser = function (room) {
-        ui.addMessage('You were granted access to ' + room, 'notification', this.activeRoom);
+    chat.client.allowUser = function (room) {
+        ui.addMessage('You were granted access to ' + room, 'notification', this.state.activeRoom);
     };
 
-    chat.userAllowed = function (user, room) {
-        ui.addMessage(user + ' now has access to ' + room, 'notification', this.activeRoom);
+    chat.client.userAllowed = function (user, room) {
+        ui.addMessage(user + ' now has access to ' + room, 'notification', this.state.activeRoom);
     };
 
-    chat.unallowUser = function (user) {
-        ui.addMessage('You access to ' + room + ' was revoked.', 'notification', this.activeRoom);
+    chat.client.unallowUser = function (user, room) {
+        ui.addMessage('You access to ' + room + ' was revoked.', 'notification', this.state.activeRoom);
     };
 
-    chat.userUnallowed = function (user, room) {
-        ui.addMessage('You have revoked ' + user + '"s access to ' + room, 'notification', this.activeRoom);
+    chat.client.userUnallowed = function (user, room) {
+        ui.addMessage('You have revoked ' + user + '"s access to ' + room, 'notification', this.state.activeRoom);
     };
 
     // Called when you make someone an owner
-    chat.ownerMade = function (user, room) {
-        ui.addMessage(user + ' is now an owner of ' + room, 'notification', this.activeRoom);
+    chat.client.ownerMade = function (user, room) {
+        ui.addMessage(user + ' is now an owner of ' + room, 'notification', this.state.activeRoom);
     };
 
-    chat.ownerRemoved = function (user, room) {
-        ui.addMessage(user + ' is no longer an owner of ' + room, 'notification', this.activeRoom);
+    chat.client.ownerRemoved = function (user, room) {
+        ui.addMessage(user + ' is no longer an owner of ' + room, 'notification', this.state.activeRoom);
     };
 
     // Called when you've been made an owner
-    chat.makeOwner = function (room) {
-        ui.addMessage('You are now an owner of ' + room, 'notification', this.activeRoom);
+    chat.client.makeOwner = function (room) {
+        ui.addMessage('You are now an owner of ' + room, 'notification', this.state.activeRoom);
     };
 
     // Called when you've been removed as an owner
-    chat.demoteOwner = function (room) {
-        ui.addMessage('You are no longer an owner of ' + room, 'notification', this.activeRoom);
+    chat.client.demoteOwner = function (room) {
+        ui.addMessage('You are no longer an owner of ' + room, 'notification', this.state.activeRoom);
     };
 
     // Called when your gravatar has been changed
-    chat.gravatarChanged = function () {
-        ui.addMessage('Your gravatar has been set', 'notification', this.activeRoom);
+    chat.client.gravatarChanged = function () {
+        ui.addMessage('Your gravatar has been set', 'notification', this.state.activeRoom);
     };
 
     // Called when the server sends a notification message
-    chat.postNotification = function (msg, room) {
+    chat.client.postNotification = function (msg, room) {
         ui.addMessage(msg, 'notification', room);
     };
 
     // Called when you created a new user
-    chat.userCreated = function () {
-        ui.setUserName(this.name);
-        ui.addMessage('Your nick is ' + this.name, 'notification');
+    chat.client.userCreated = function () {
+        ui.setUserName(this.state.name);
+        ui.addMessage('Your nick is ' + this.state.name, 'notification');
 
         // Process any urls that may contain room names
         ui.run();
 
-        if (!this.activeRoom) {
+        if (!this.state.activeRoom) {
             // Set the active room to the lobby so the rooms on the right load
             ui.setActiveRoom('Lobby');
         }
@@ -440,7 +438,7 @@
         updateCookie();
     };
 
-    chat.logOut = function (rooms) {
+    chat.client.logOut = function (rooms) {
         ui.setActiveRoom('Lobby');
 
         // Close all rooms
@@ -448,12 +446,12 @@
             ui.removeRoom(this);
         });
 
-        ui.addMessage("You've been logged out.", 'notification', this.activeRoom);
+        ui.addMessage("You've been logged out.", 'notification', this.state.activeRoom);
 
-        chat.activeRoom = undefined;
-        chat.name = undefined;
-        chat.id = undefined;
-        chat.employeeId = undefined;
+        chat.state.activeRoom = undefined;
+        chat.state.name = undefined;
+        chat.state.id = undefined;
+        chat.state.employeeId = undefined;
 
         updateCookie();
 
@@ -461,11 +459,11 @@
         document.location = document.location.pathname;
     };
 
-    chat.forceUpdate = function () {
+    chat.client.forceUpdate = function () {
         ui.showUpdateUI();
     };
 
-    chat.showUserInfo = function (userInfo) {
+    chat.client.showUserInfo = function (userInfo) {
         var lastActivityDate = userInfo.LastActivity.fromJsonDate();
         var status = "Currently " + userInfo.Status;
         if (userInfo.IsAfk) {
@@ -489,23 +487,23 @@
         chat.showUsersOwnedRoomList(userInfo.Name, userInfo.OwnedRooms);
     };
 
-    chat.setPassword = function () {
-        ui.addMessage('Your password has been set', 'notification', this.activeRoom);
+    chat.client.setPassword = function () {
+        ui.addMessage('Your password has been set', 'notification', this.state.activeRoom);
     };
 
-    chat.changePassword = function () {
-        ui.addMessage('Your password has been changed', 'notification', this.activeRoom);
+    chat.client.changePassword = function () {
+        ui.addMessage('Your password has been changed', 'notification', this.state.activeRoom);
     };
 
     // Called when you have added or cleared a note
-    chat.noteChanged = function (isAfk, isCleared) {
+    chat.client.noteChanged = function (isAfk, isCleared) {
         var afkMessage = 'You have gone AFK';
         var noteMessage = 'Your note has been ' + (isCleared ? 'cleared' : 'set');
-        ui.addMessage(isAfk ? afkMessage : noteMessage, 'notification', this.activeRoom);
+        ui.addMessage(isAfk ? afkMessage : noteMessage, 'notification', this.state.activeRoom);
     };
 
     // Make sure all the people in all the rooms know that a user has changed their note.
-    chat.changeNote = function (user, room) {
+    chat.client.changeNote = function (user, room) {
         var viewModel = getUserViewModel(user);
 
         ui.changeNote(viewModel, room);
@@ -523,37 +521,42 @@
         }
     };
 
-    chat.changeTopic = function (room) {
+    chat.client.changeTopic = function (room) {
         ui.changeRoomTopic(room);
     };
 
-    chat.topicChanged = function (isCleared, topic) {
+    chat.client.topicChanged = function (roomName, isCleared, topic, who) {
         var action = isCleared ? 'cleared' : 'set';
         var to = topic ? ' to ' + '"' + topic + '"' : '';
-        var message = 'You have ' + action + ' the room topic' + to;
-        ui.addMessage(message, 'notification', this.activeRoom);
+        var message = action + ' the room topic' + to;
+        if (who === ui.getUserName()) {
+            message = 'You have ' + message;
+        } else {
+            message = who + ' has ' + message;
+        }
+        ui.addMessage(message, 'notification', roomName);
     };
 
-    chat.welcomeChanged = function (isCleared, welcome) {
+    chat.client.welcomeChanged = function (isCleared, welcome) {
         var action = isCleared ? 'cleared' : 'set';
         var to = welcome ? ' to:' : '';
         var message = 'You have ' + action + ' the room welcome' + to;
-        ui.addMessage(message, 'notification', this.activeRoom);
+        ui.addMessage(message, 'notification', this.state.activeRoom);
         if (welcome) {
-            ui.addMessage(welcome, 'welcome', this.activeRoom);
+            ui.addMessage(welcome, 'welcome', this.state.activeRoom);
         }
     };
 
     // Called when you have added or cleared a flag
-    chat.flagChanged = function (isCleared, country) {
+    chat.client.flagChanged = function (isCleared, country) {
         var action = isCleared ? 'cleared' : 'set';
         var place = country ? ' to ' + country : '';
         var message = 'You have ' + action + ' your flag' + place;
-        ui.addMessage(message, 'notification', this.activeRoom);
+        ui.addMessage(message, 'notification', this.state.activeRoom);
     };
 
     // Make sure all the people in the all the rooms know that a user has changed their flag
-    chat.changeFlag = function (user, room) {
+    chat.client.changeFlag = function (user, room) {
         var viewModel = getUserViewModel(user);
 
         ui.changeFlag(viewModel, room);
@@ -566,23 +569,23 @@
         }
     };
 
-    chat.userNameChanged = function (user) {
+    chat.client.userNameChanged = function (user) {
         // Update the client state
-        chat.name = user.Name;
-        ui.setUserName(chat.name);
-        ui.addMessage('Your name is now ' + user.Name, 'notification', this.activeRoom);
+        chat.state.name = user.Name;
+        ui.setUserName(chat.state.name);
+        ui.addMessage('Your name is now ' + user.Name, 'notification', this.state.activeRoom);
     };
 
-    chat.setTyping = function (user, room) {
+    chat.client.setTyping = function (user, room) {
         var viewModel = getUserViewModel(user);
         ui.setUserTyping(viewModel, room);
     };
 
-    chat.sendMeMessage = function (name, message, room) {
+    chat.client.sendMeMessage = function (name, message, room) {
         ui.addMessage('*' + name + ' ' + message, 'notification memsg', room);
     };
 
-    chat.sendPrivateMessage = function (from, to, message) {
+    chat.client.sendPrivateMessage = function (from, to, message) {
         if (isSelf({ Name: to })) {
             // Force notification for direct messages
             ui.notify(true);
@@ -592,7 +595,7 @@
         ui.addPrivateMessage('<emp>*' + from + '* &raquo; *' + to + '*</emp> ' + message, 'pm');
     };
 
-    chat.sendInvite = function (from, to, roomLink) {
+    chat.client.sendInvite = function (from, to, roomLink) {
         if (isSelf({ Name: to })) {
             ui.notify(true);
             ui.addPrivateMessage('*' + from + '* has invited you to ' + roomLink + '. Click the room name to join.', 'pm');
@@ -602,7 +605,7 @@
         }
     };
 
-    chat.nudge = function (from, to) {
+    chat.client.nudge = function (from, to) {
         function shake(n) {
             var move = function (x, y) {
                 parent.moveBy(x, y);
@@ -623,8 +626,7 @@
                     move(0, i);
                 }
             }
-            return this;
-        };
+        }
         $("body").effect("pulsate", { times: 3 }, 300);
         window.setTimeout(function () {
             shake(20);
@@ -633,7 +635,7 @@
         ui.addMessage('*' + from + ' nudged ' + (to ? 'you' : 'the room'), to ? 'pm' : 'notification');
     };
 
-    chat.leave = function (user, room) {
+    chat.client.leave = function (user, room) {
         if (isSelf(user)) {
             ui.setActiveRoom('Lobby');
             ui.removeRoom(room);
@@ -645,14 +647,14 @@
         }
     };
 
-    chat.kick = function (room) {
+    chat.client.kick = function (room) {
         ui.setActiveRoom('Lobby');
         ui.removeRoom(room);
         ui.addMessage('You were kicked from ' + room, 'notification');
     };
 
     // Helpish commands
-    chat.showRooms = function (rooms) {
+    chat.client.showRooms = function (rooms) {
         ui.addMessage('Rooms', 'list-header');
         if (!rooms.length) {
             ui.addMessage('No rooms available', 'list-item');
@@ -669,14 +671,11 @@
         }
     };
 
-    chat.showCommands = function () {
-        ui.addMessage('Help', 'list-header');
-        $.each(ui.getCommands(), function () {
-            ui.addMessage(this.Name + ' - ' + this.Description, 'list-item');
-        });
+    chat.client.showCommands = function () {
+        ui.showHelp();
     };
 
-    chat.showUsersInRoom = function (room, names) {
+    chat.client.showUsersInRoom = function (room, names) {
         ui.addMessage('Users in ' + room, 'list-header');
         if (names.length === 0) {
             ui.addMessage('Room is empty', 'list-item');
@@ -688,7 +687,7 @@
         }
     };
 
-    chat.listUsers = function (users) {
+    chat.client.listUsers = function (users) {
         if (users.length === 0) {
             ui.addMessage('No users matched your search', 'list-header');
         }
@@ -698,7 +697,7 @@
         }
     };
 
-    chat.showUsersRoomList = function (user, rooms) {
+    chat.client.showUsersRoomList = function (user, rooms) {
         var status = "Currently " + user.Status;
         if (rooms.length === 0) {
             ui.addMessage(user.Name + ' (' + status + ') is not in any rooms', 'list-header');
@@ -709,7 +708,7 @@
         }
     };
 
-    chat.showUsersOwnedRoomList = function (user, rooms) {
+    chat.client.showUsersOwnedRoomList = function (user, rooms) {
         if (rooms.length === 0) {
             ui.addMessage(user + ' does not own any rooms', 'list-header');
         }
@@ -719,47 +718,47 @@
         }
     };
 
-    chat.addAdmin = function (user, room) {
+    chat.client.addAdmin = function (user, room) {
         ui.setRoomAdmin(user.Name, room);
     };
 
-    chat.removeAdmin = function (user, room) {
+    chat.client.removeAdmin = function (user, room) {
         ui.clearRoomAdmin(user.Name, room);
     };
 
     // Called when you make someone an admin
-    chat.adminMade = function (user) {
-        ui.addMessage(user + ' is now an admin', 'notification', this.activeRoom);
+    chat.client.adminMade = function (user) {
+        ui.addMessage(user + ' is now an admin', 'notification', this.state.activeRoom);
     };
 
-    chat.adminRemoved = function (user) {
-        ui.addMessage(user + ' is no longer an admin', 'notification', this.activeRoom);
+    chat.client.adminRemoved = function (user) {
+        ui.addMessage(user + ' is no longer an admin', 'notification', this.state.activeRoom);
     };
 
     // Called when you've been made an admin
-    chat.makeAdmin = function () {
-        ui.addMessage('You are now an admin', 'notification', this.activeRoom);
+    chat.client.makeAdmin = function () {
+        ui.addMessage('You are now an admin', 'notification', this.state.activeRoom);
     };
 
     // Called when you've been removed as an admin
-    chat.demoteAdmin = function () {
-        ui.addMessage('You are no longer an admin', 'notification', this.activeRoom);
+    chat.client.demoteAdmin = function () {
+        ui.addMessage('You are no longer an admin', 'notification', this.state.activeRoom);
     };
 
-    chat.broadcastMessage = function (message, room) {
+    chat.client.broadcastMessage = function (message, room) {
         ui.addMessage('ADMIN: ' + message, 'broadcast', room);
     };
 
     $ui.bind(ui.events.typing, function () {
         // If not in a room, don't try to send typing notifications
-        if (!chat.activeRoom) {
+        if (!chat.state.activeRoom) {
             return;
         }
 
         if (checkingStatus === false && typing === false) {
             typing = true;
 
-            chat.typing(chat.activeRoom);
+            chat.server.typing(chat.state.activeRoom);
 
             window.setTimeout(function () {
                 typing = false;
@@ -773,7 +772,7 @@
             clientMessage = {
                 id: id,
                 content: msg,
-                room: chat.activeRoom
+                room: chat.state.activeRoom
             },
             messageCompleteTimeout = null;
 
@@ -781,7 +780,7 @@
         if (msg[0] !== '/') {
 
             // if you're in the lobby, you can't send mesages (only commands)
-            if (chat.activeRoom === undefined) {
+            if (chat.state.activeRoom === undefined) {
                 ui.addMessage('You cannot send messages within the Lobby', 'error');
                 return false;
             }
@@ -789,14 +788,14 @@
             // Added the message to the ui first
             var regt = new RegExp("^>");
             var viewModel = {
-                name: chat.name,
-                hash: chat.hash,
+                name: chat.state.name,
+                hash: chat.state.hash,
                 message: $('<div/>').text(clientMessage.content).html(),
                 id: clientMessage.id,
                 date: new Date(),
                 highlight: '',
                 greentext: regt.test(clientMessage.content) ? 'greentext' : '',
-                employeeId: chat.employeeId
+                employeeId: chat.state.employeeId
             };
 
             ui.addChatMessage(viewModel, clientMessage.room);
@@ -812,7 +811,7 @@
             pendingMessages[id] = messageCompleteTimeout;
         }
 
-        chat.send(clientMessage)
+        chat.server.send(clientMessage)
             .done(function (requiresUpdate) {
                 if (requiresUpdate === true) {
                     ui.showUpdateUI();
@@ -850,7 +849,7 @@
     });
 
     $ui.bind(ui.events.openRoom, function (ev, room) {
-        chat.send('/join ' + room, chat.activeRoom)
+        chat.server.send('/join ' + room, chat.state.activeRoom)
             .fail(function (e) {
                 ui.setActiveRoom('Lobby');
                 ui.addMessage(e, 'error');
@@ -858,7 +857,7 @@
     });
 
     $ui.bind(ui.events.closeRoom, function (ev, room) {
-        chat.send('/leave ' + room, chat.activeRoom)
+        chat.server.send('/leave ' + room, chat.state.activeRoom)
             .fail(function (e) {
                 ui.addMessage(e, 'error');
             });
@@ -882,11 +881,11 @@
             populateLobbyRooms();
 
             // Remove the active room
-            chat.activeRoom = undefined;
+            chat.state.activeRoom = undefined;
         }
         else {
             // When the active room changes update the client state and the cookie
-            chat.activeRoom = room;
+            chat.state.activeRoom = room;
         }
 
         ui.scrollToBottom(room);
@@ -902,7 +901,7 @@
         loadingHistory = true;
 
         // TODO: Show a little animation so the user experience looks fancy
-        chat.getPreviousMessages(roomInfo.messageId)
+        chat.server.getPreviousMessages(roomInfo.messageId)
             .done(function (messages) {
                 ui.prependChatMessages($.map(messages, getMessageViewModel), roomInfo.name);
                 loadingHistory = false;
@@ -924,7 +923,7 @@
         ui.initialize(state.preferences);
 
         ui.addMessage('Welcome to ' + originalTitle, 'notification');
-        ui.addMessage('Type /help to see the list of commands', 'notification');
+        ui.addMessage('Use ? or type /? to display the FAQ and list of commands', 'notification');
 
         function initConnection() {
             var logging = $.cookie('jabbr.logging') === '1',
@@ -932,13 +931,13 @@
                 options = {};
 
             if (transport) {
-                options['transport'] = transport;
+                options.transport = transport;
             }
 
             connection.hub.logging = logging;
 
             connection.hub.start(options, function () {
-                chat.join()
+                chat.server.join()
                 .fail(function (e) {
                     ui.addMessage(e, 'error');
                 })
@@ -957,9 +956,14 @@
                         }
                     }
                     // get list of available commands
-                    chat.getCommands()
+                    chat.server.getCommands()
                         .done(function (commands) {
                             ui.setCommands(commands);
+                        });
+                    // get list of available shortcuts
+                    chat.server.getShortcuts()
+                        .done(function (shortcuts) {
+                            ui.setShortcuts(shortcuts);
                         });
                 });
             });
@@ -971,7 +975,7 @@
 
                 checkingStatus = true;
 
-                chat.checkStatus()
+                chat.server.checkStatus()
                     .done(function (requiresUpdate) {
                         if (requiresUpdate === true) {
                             ui.showUpdateUI();

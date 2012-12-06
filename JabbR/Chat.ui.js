@@ -2,7 +2,7 @@
 /// <reference path="Scripts/jQuery.tmpl.js" />
 /// <reference path="Scripts/jquery.cookie.js" />
 /// <reference path="Chat.toast.js" />
-
+/*global Emoji:true, janrain:true */
 (function ($, window, document, utility) {
     "use strict";
 
@@ -16,22 +16,33 @@
         $downloadDialog = null,
         $downloadDialogButton = null,
         $downloadRange = null,
+        $help = null,
         $ui = null,
         $sound = null,
         templates = null,
         focus = true,
         commands = [],
-        Keys = { Up: 38, Down: 40, Esc: 27, Enter: 13, Slash: 47, Space: 32, Tab: 9 },
+        shortcuts = [],
+        Keys = { Up: 38, Down: 40, Esc: 27, Enter: 13, Slash: 47, Space: 32, Tab: 9, Question: 191 },
         scrollTopThreshold = 75,
         toast = window.chat.toast,
         preferences = null,
         $login = null,
         name,
         lastCycledMessage = null,
+        $helpPopup = null,
+        $helpBody = null,
+        helpHeight = 0,
+        $shortCutHelp = null,
+        $globalCmdHelp = null,
+        $roomCmdHelp = null,
+        $userCmdHelp = null,
         $updatePopup = null,
         $window = $(window),
         $document = $(document),
+        $lobbyRoomFilterForm = null,
         $roomFilterInput = null,
+        $closedRoomFilter = null,
         updateTimeout = 15000,
         $richness = null,
         lastPrivate = null,
@@ -39,7 +50,7 @@
         $emotelistDialog = null;
 
     function getRoomId(roomName) {
-        return escape(roomName.toLowerCase()).replace(/[^a-z0-9]/, '_');
+        return window.escape(roomName.toLowerCase()).replace(/[^a-z0-9]/, '_');
     }
 
     function getUserClassName(userName) {
@@ -48,6 +59,10 @@
 
     function getRoomPreferenceKey(roomName) {
         return '_room_' + roomName;
+    }
+
+    function showClosedRoomsInLobby() {
+        return $closedRoomFilter.is(':checked');
     }
 
     function Room($tab, $usersContainer, $usersOwners, $usersActive, $usersIdle, $messages, $roomTopic) {
@@ -99,6 +114,14 @@
 
         this.hasUnread = function () {
             return this.tab.hasClass('unread');
+        };
+
+        this.hasMessages = function () {
+            return this.tab.data('messages');
+        };
+
+        this.updateMessages = function (value) {
+            this.tab.data('messages', value);
         };
 
         this.getUnread = function () {
@@ -156,11 +179,12 @@
         };
 
         this.scrollToBottom = function () {
-            var height = this.messages[0].scrollHeight - this.messages.height();
-
-            this.messages
-                .scrollTop(height - 1) // Fix for bug in Chrome
-                .scrollTop(height);
+            // IE will repaint if we do the Chrome bugfix and look jumpy
+            if ($.browser.webkit) {
+                // Chrome fix for hiding and showing scroll areas
+                this.messages.scrollTop(this.messages.scrollTop() - 1);
+            }
+            this.messages.scrollTop(this.messages[0].scrollHeight);
         };
 
         this.isNearTheEnd = function () {
@@ -213,7 +237,7 @@
                       .hide();
 
             if (this.isLobby()) {
-                $roomFilterInput.hide();
+                $lobbyRoomFilterForm.hide();
             }
         };
 
@@ -245,7 +269,7 @@
                       .show();
 
             if (this.isLobby()) {
-                $roomFilterInput.show();
+                $lobbyRoomFilterForm.show();
             }
             // if no unread since last separator
             // remove previous separator
@@ -279,7 +303,7 @@
         this.setListState = function (list) {
             if (list.children('li').length > 0) {
                 var roomEmptyStatus = list.children('li.empty');
-                if (roomEmptyStatus.length == 0) {
+                if (roomEmptyStatus.length === 0) {
                     return;
                 } else {
                     roomEmptyStatus.remove();
@@ -304,7 +328,7 @@
             var oldParentList = $user.parent('ul');
             $user.appendTo(list);
             this.setListState(list);
-            if (typeof oldParentList != undefined) {
+            if (typeof oldParentList !== undefined) {
                 this.setListState(oldParentList);
             }
         };
@@ -350,7 +374,7 @@
                 var compA = $(a).data('name').toString().toUpperCase();
                 var compB = $(b).data('name').toString().toUpperCase();
                 return (compA < compB) ? -1 : (compA > compB) ? 1 : 0;
-            })
+            });
             $.each(listItems, function (index, item) { listToSort.append(item); });
         };
     }
@@ -488,8 +512,11 @@
                 return;
             }
 
-            // If you're we're near the top, raise the event
-            if ($(this).scrollTop() <= scrollTopThreshold) {
+            // If you're we're near the top, raise the event, but if the scroll
+            // bar is small enough that we're at the bottom edge, ignore it.
+            // We have to use the ui version because the room object above is
+            // not fully initialized, so there are no messages.
+            if ($(this).scrollTop() <= scrollTopThreshold && !ui.isNearTheEnd(roomId)) {
                 var $child = $messages.children('.message:first');
                 if ($child.length > 0) {
                     messageId = $child.attr('id')
@@ -579,7 +606,6 @@
 
     function loadPreferences() {
         // Restore the global preferences
-
     }
 
     function toggleElement($element, preferenceName, roomName) {
@@ -729,9 +755,9 @@
     // Rotating Tips.
     var messages = [
                 'Type @ then press TAB to auto-complete nicknames',
-                'Type /help to see the list of commands',
+                'Use ? or type /? to display the FAQ and list of commands',
                 'Type : then press TAB to auto-complete emoji icons',
-                'You can create your own private rooms. Type /help for more info'
+                'You can create your own private rooms. Use ? or type /? for more info'
             ];
 
     var cycleTimeInMilliseconds = 60 * 1000; // 1 minute.
@@ -749,7 +775,7 @@
 
             $('#message-instruction').fadeIn(2000, cycleMessages);
         }, cycleTimeInMilliseconds);
-    };
+    }
 
     var ui = {
 
@@ -769,6 +795,13 @@
             preferencesChanged: 'jabbr.ui.preferencesChanged'
         },
 
+        help: {
+            shortcut: 'shortcut',
+            global: 'global',
+            room: 'room',
+            user: 'user'
+        },
+
         initialize: function (state) {
             $ui = $(this);
             preferences = state || {};
@@ -785,11 +818,20 @@
             $downloadDialog = $('#download-dialog');
             $downloadDialogButton = $('#download-dialog-button');
             $downloadRange = $('#download-range');
+            $help = $('#preferences .help');
             $disconnectDialog = $('#disconnect-dialog');
             $login = $('#jabbr-login');
+            $helpPopup = $('#jabbr-help');
+            $helpBody = $('#jabbr-help .help-body');
+            $shortCutHelp = $('#jabbr-help #shortcut');
+            $globalCmdHelp = $('#jabbr-help #global');
+            $roomCmdHelp = $('#jabbr-help #room');
+            $userCmdHelp = $('#jabbr-help #user');
             $updatePopup = $('#jabbr-update');
             focus = true;
-            $roomFilterInput = $('#users-filter');
+            $lobbyRoomFilterForm = $('#users-filter-form'),
+            $roomFilterInput = $('#users-filter'),
+            $closedRoomFilter = $('#users-filter-closed');
             templates = {
                 userlist: $('#new-userlist-template'),
                 user: $('#new-user-template'),
@@ -797,15 +839,16 @@
                 notification: $('#new-notification-template'),
                 separator: $('#message-separator-template'),
                 tab: $('#new-tab-template'),
-                gravatarprofile: $('#gravatar-profile-template')
+                gravatarprofile: $('#gravatar-profile-template'),
+                commandhelp: $('#command-help-template')
             };
 
             if (toast.canToast()) {
                 $toast.show();
             }
             else {
-                $richness.css({ left: '26px' });
-                $downloadIcon.css({ left: '62px' });
+                $richness.css({ left: '55px' });
+                $downloadIcon.css({ left: '90px' });
                 $emotelist.css({ left: '92px' });
                 // We need to set the toast setting to false
                 preferences.canToast = false;
@@ -824,7 +867,7 @@
             });
 
             $document.on('click', '#tabs li', function () {
-                ui.setActiveRoom($(this).data('name'))
+                ui.setActiveRoom($(this).data('name'));
             });
 
             $document.on('click', 'li.room', function () {
@@ -857,6 +900,7 @@
             });
 
             // handle tab cycling - we skip the lobby when cycling
+            // handle shift+/ - display help command
             $document.on('keydown', function (ev) {
                 if (ev.keyCode === Keys.Tab && $newMessage.val() === "") {
                     var current = getCurrentRoomElements(),
@@ -874,6 +918,27 @@
                     ui.setActiveRoom($tabs.children().eq(index).data('name'));
                     $newMessage.focus();
                 }
+
+                if (!$newMessage.is(':focus') && ev.shiftKey && ev.keyCode === Keys.Question) {
+                    ui.showHelp();
+                    // Prevent the ? be recorded in the message box
+                    ev.preventDefault();
+                }
+            });
+
+            // hack to get Chrome to scroll back to top of help body
+            // when redisplaying it after scrolling down and closing it
+            $helpPopup.on('hide', function () {
+                $helpBody.scrollTop(0);
+            });
+
+            // set the height of the help body when displaying the help dialog
+            // so that the scroll bar does not block the rounded corners
+            $helpPopup.on('show', function () {
+                if (helpHeight === 0) {
+                    helpHeight = $helpPopup.height() - $helpBody.position().top - 10;
+                }
+                $helpBody.css('height', helpHeight);
             });
 
             // handle click on names in chat / room list
@@ -897,7 +962,7 @@
                 message = '/msg ' + $(this).text().trim() + ' ' + message;
                 ui.setMessage(message);
                 return false;
-            }
+            };
             $document.on('click', '.users li.user .name', prepareMessage);
             $document.on('click', '.message .left .name', prepareMessage);
 
@@ -984,10 +1049,6 @@
 
             $(toast).bind('toast.focus', function (ev, room) {
                 window.focus();
-
-                if (room) {
-                    ui.setActiveRoom(room);
-                }
             });
 
             $downloadIcon.click(function () {
@@ -1019,6 +1080,28 @@
                 $('<iframe style="display:none">').attr('src', url).appendTo(document.body);
 
                 $downloadDialog.modal('hide');
+            });
+            $help.click(function () {
+                ui.showHelp();
+            });
+            $closedRoomFilter.click(function () {
+                var room = getCurrentRoomElements(),
+                    show = $(this).is(':checked');
+
+                // bounce on any room other than lobby
+                if (!room.isLobby()) {
+                    return false;
+                }
+
+                // hide the closed rooms from lobby list
+                if (show) {
+                    room.users.find('.closed').show();
+                } else {
+                    room.users.find('.closed').hide();
+                }
+
+                // clear the search text and update search list
+                ui.$roomFilter.update();
             });
 
             $emotelist.click(function () {
@@ -1094,7 +1177,7 @@
 
             // Auto-complete for user names
             $newMessage.autoTabComplete({
-                prefixMatch: '[@#/\:]',
+                prefixMatch: '[@#/:]',
                 get: function (prefix) {
                     switch (prefix) {
                         case '@':
@@ -1147,7 +1230,14 @@
             loadPreferences();
 
             // Initilize liveUpdate plugin for room search
-            ui.$roomFilter = $roomFilterInput.liveUpdate('#userlist-lobby', true);
+            ui.$roomFilter = $roomFilterInput.liveUpdate('#userlist-lobby', function ($theListItem) {
+                if ($theListItem.hasClass('closed') && !showClosedRoomsInLobby()) {
+                    return;
+                }
+
+                // show it
+                $theListItem.show();
+            });
 
             // Start cycling the messages once the document has finished loading.
             cycleMessages();
@@ -1271,6 +1361,10 @@
                     // images loading at the same time.
                     if (!room.messages.isNearTheEnd() && scrollTopBefore === room.messages.scrollTop()) {
                         room.scrollToBottom();
+                        // Reset our scrollTopBefore so we know we are allowed
+                        // to move it again if another image loads and the user
+                        // hasn't touched it
+                        scrollTopBefore = room.messages.scrollTop();
                     }
 
                     // unbind the event from this object after it executes
@@ -1285,16 +1379,17 @@
         },
         populateLobbyRooms: function (rooms) {
             var lobby = getLobby(),
+                showClosedRooms = $closedRoomFilter.is(':checked'),
             // sort lobby by room open ascending then count descending
-            sorted = rooms.sort(function (a, b) {
-                if (a.Closed && !b.Closed) {
-                    return 1;
-                } else if (b.Closed && !a.Closed) {
-                    return -1;
-                }
+                sorted = rooms.sort(function (a, b) {
+                    if (a.Closed && !b.Closed) {
+                        return 1;
+                    } else if (b.Closed && !a.Closed) {
+                        return -1;
+                    }
 
-                return a.Count > b.Count ? -1 : 1;
-            });
+                    return a.Count > b.Count ? -1 : 1;
+                });
 
             lobby.users.empty();
 
@@ -1320,12 +1415,15 @@
                 }
                 if (this.Closed) {
                     $li.addClass('closed');
+                    if (!showClosedRooms) {
+                        $li.hide();
+                    }
                 }
             });
 
             if (lobby.isActive()) {
                 // update cache of room names
-                $roomFilterInput.show();
+                $lobbyRoomFilterForm.show();
             }
 
             ui.$roomFilter.update();
@@ -1360,16 +1458,21 @@
             var $user = $('.users').find(getUserClassName(userViewModel.name)),
                 active = $user.data('active');
 
-            if (userViewModel.active !== active) {
-                if (userViewModel.active === true) {
-                    $user.fadeTo('slow', 1, function () {
-                        $user.removeClass('idle');
-                    });
-                } else {
-                    $user.fadeTo('slow', 0.5, function () {
-                        $user.addClass('idle');
-                    });
-                }
+            var fadeSpeed = 'slow';
+            // If the states match it means they're not changing and the user
+            // is joining a room. In that case, set the fade time to be 1ms.
+            if (userViewModel.active === active) {
+                fadeSpeed = 1;
+            }
+
+            if (userViewModel.active === true) {
+                $user.fadeTo(fadeSpeed, 1, function () {
+                    $user.removeClass('idle');
+                });
+            } else {
+                $user.fadeTo(fadeSpeed, 0.5, function () {
+                    $user.addClass('idle');
+                });
             }
 
             updateNote(userViewModel, $user);
@@ -1426,7 +1529,12 @@
 
             $user.addClass('removing')
                 .fadeOut('slow', function () {
+                    var owner = $user.data('owner') || false;
                     $(this).remove();
+
+                    if (owner === true) {
+                        room.setListState(room.owners);
+                    }
                 });
         },
         setUserTyping: function (userViewModel, roomName) {
@@ -1583,7 +1691,7 @@
 
                     if (ui.focus === false && anyRoomPreference('canToast') === true) {
                         // Only toast if there's no focus (even on mentions)
-                        ui.toast(message, true);
+                        ui.toast(message, true, roomName);
                     }
                 }
                 else {
@@ -1617,7 +1725,7 @@
         addPrivateMessage: function (content, type) {
             var rooms = getAllRoomElements();
             for (var r in rooms) {
-                if (rooms[r].getName() != undefined && rooms[r].isClosed() === false) {
+                if (rooms[r].getName() !== undefined && rooms[r].isClosed() === false) {
                     this.addMessage(content, type, rooms[r].getName());
                 }
             }
@@ -1663,8 +1771,12 @@
             return $element;
         },
         appendMessage: function (newMessage, room) {
-            // Determine if we need to show a new date header
-            if (!$(newMessage).is('.date-header')) {
+            // Determine if we need to show a new date header: Two conditions
+            // for instantly skipping are if this message is a date header, or
+            // if the room only contains non-chat messages and we're adding a
+            // non-chat message.
+            var isMessage = $(newMessage).is('.message');
+            if (!$(newMessage).is('.date-header') && (isMessage || room.hasMessages())) {
                 var lastMessage = room.messages.find('li[data-timestamp]').last(),
                     lastDate = new Date(lastMessage.data('timestamp')),
                     thisDate = new Date($(newMessage).data('timestamp'));
@@ -1675,10 +1787,20 @@
                 }
             }
 
+            if (isMessage) {
+                room.updateMessages(true);
+            }
+
             $(newMessage).appendTo(room.messages);
         },
         hasFocus: function () {
             return ui.focus;
+        },
+        getShortcuts: function () {
+            return ui.shortcuts;
+        },
+        setShortcuts: function (shortcuts) {
+            ui.shortcuts = shortcuts;
         },
         getCommands: function () {
             return ui.commands;
@@ -1737,9 +1859,9 @@
                 $('#noftificationSound')[0].play();
             }
         },
-        toast: function (message, force) {
+        toast: function (message, force, roomName) {
             if (getActiveRoomPreference('canToast') === true || force) {
-                toast.toastMessage(message);
+                toast.toastMessage(message, roomName);
             }
         },
         setUserName: function (name) {
@@ -1766,6 +1888,32 @@
         },
         showDisconnectUI: function () {
             $disconnectDialog.modal();
+        },
+        showHelp: function () {
+            $shortCutHelp.empty();
+            $globalCmdHelp.empty();
+            $roomCmdHelp.empty();
+            $userCmdHelp.empty();
+            $.each(ui.getCommands(), function () {
+                switch (this.Group) {
+                    case ui.help.shortcut:
+                        $shortCutHelp.append(templates.commandhelp.tmpl(this));
+                        break;
+                    case ui.help.global:
+                        $globalCmdHelp.append(templates.commandhelp.tmpl(this));
+                        break;
+                    case ui.help.room:
+                        $roomCmdHelp.append(templates.commandhelp.tmpl(this));
+                        break;
+                    case ui.help.user:
+                        $userCmdHelp.append(templates.commandhelp.tmpl(this));
+                        break;
+                }
+            });
+            $.each(ui.getShortcuts(), function () {
+                $shortCutHelp.append(templates.commandhelp.tmpl(this));
+            });
+            $helpPopup.modal();
         },
         showUpdateUI: function () {
             $updatePopup.modal();
@@ -1856,6 +2004,10 @@
             var room = getRoomElements(roomName);
 
             room.unClose();
+        },
+        setRoomListStatuses: function (roomName) {
+            var room = roomName ? getRoomElements(roomName) : getCurrentRoomElements();
+            room.setListState(room.owners);
         }
     };
 

@@ -4,7 +4,7 @@ using JabbR.Models;
 
 namespace JabbR.Commands
 {
-    [Command("where", "Type /where [name] to list the rooms that user is in")]
+    [Command("where", "List the rooms that user is in.", "nickname", "user")]
     public class WhereCommand : UserCommand
     {
         public override void Execute(CommandContext context, CallerContext callerContext, ChatUser callingUser, string[] args)

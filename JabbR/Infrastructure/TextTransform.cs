@@ -43,14 +43,14 @@ namespace JabbR.Infrastructure
             return message;
         }
 
-        static Regex urlPattern = new Regex(@"(?:(?:https?|ftp)://|www\.)[^\s]+", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        static Regex urlPattern = new Regex(@"(?i)\b((?:[a-z][\w-]+:(?:/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'"".,<>?«»“”‘’]))", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         public static string TransformAndExtractUrls(string message, out HashSet<string> extractedUrls)
         {
             var urls = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             message = urlPattern.Replace(message, m =>
             {
-                string url = m.Value;
+                string url = HttpUtility.HtmlDecode(m.Value);
                 if (!url.Contains("://"))
                 {
                     url = "http://" + url;
@@ -61,7 +61,7 @@ namespace JabbR.Infrastructure
                     return m.Value;
                 }
 
-                urls.Add(HttpUtility.HtmlDecode(url));
+                urls.Add(url);
 
                 return String.Format(CultureInfo.InvariantCulture,
                                      "<a rel=\"nofollow external\" target=\"_blank\" href=\"{0}\" title=\"{1}\">{1}</a>",

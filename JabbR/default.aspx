@@ -5,30 +5,35 @@
     string appName = ConfigurationManager.AppSettings["auth.appName"];
     string apiKey = ConfigurationManager.AppSettings["auth.apiKey"];
     string googleAnalytics = ConfigurationManager.AppSettings["googleAnalytics"];
+
+    string sha = ConfigurationManager.AppSettings["releaseSha"];
+    string branch = ConfigurationManager.AppSettings["releaseBranch"];
+    string time = ConfigurationManager.AppSettings["releaseTime"];
+    bool showReleaseDetails = !String.IsNullOrEmpty(sha) && !String.IsNullOrEmpty(branch) && !String.IsNullOrEmpty(time);
 %>
 
 <!DOCTYPE html>
 <html>
 <head>
     <title>JabbR</title>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=9" />
-    <meta name="description" content="A real-time chat application. IRC without the R." />
+    <meta name="description" content="A real-time chat application." />
     <meta name="keywords" content="chat,realtime chat,signalr,jabbr" />
-    <link href="<%= Page.ResolveUrl("~/Content/images/logo32.png") %>" rel="icon" type="image/png" sizes="32x32">
-    <link href="<%= Page.ResolveUrl("~/Content/images/logo64.png") %>" rel="icon" type="image/png" sizes="64x64">
-    <link rel="shortcut icon" href="favicon.ico" />
+    <link href="/Content/images/logo32.png" rel="icon" type="image/png" sizes="32x32">
+    <link href="/Content/images/logo64.png" rel="icon" type="image/png" sizes="64x64">
+    <link href="/favicon.ico" rel="shortcut icon" type="image/x-icon" sizes="16x16">
     <%= Bundle.Css()
-            .Add("~/Chat.css",
-                  "~/Chat.nuget.css",
-                  "~/Chat.bbcnews.css",
-                  "~/Chat.githubissues.css",
-                  "~/Chat.dictionary.css",
-                  "~/Content/KeyTips.css",
-                  "~/Content/bootstrap.min.css",
-                  "~/Content/emoji20.css",
-                  "~/Content/ponymoticon.css",
-                  "~/Content/themes/base/jquery-ui.css")
+            .Add("~/Chat.css")
+            .Add("~/Chat.nuget.css")
+            .Add("~/Chat.bbcnews.css")
+            .Add("~/Chat.githubissues.css")
+            .Add("~/Chat.dictionary.css")
+            .Add("~/Content/KeyTips.css")
+            .Add("~/Content/bootstrap.min.css")
+            .Add("~/Content/emoji20.css")
+            .Add("~/Content/emoji20.css")
+            .Add("~/Content/ponymoticon.css")
+            .Add("~/Content/themes/base/jquery-ui.css")
             //.ForceRelease()
             .Render("~/Content/JabbR_#.css")
   %>
@@ -144,6 +149,13 @@
             <div class="close"></div>
         </li>
     </script>
+    <script id="command-help-template" type="text/x-jquery-tmpl">
+        <dt>
+            <span class="command command-name">${Name}</span> 
+            {{if Arguments}}<span class="command command-args">${Arguments}</span>{{/if}}
+        </dt>
+        <dd>${Description}</dd>
+    </script>
     <!-- TweetContentProvider: Should be extracted out if other content providers need templates -->
     <script id="tweet-template" type="text/x-jquery-tmpl">
         <div class="user">
@@ -227,8 +239,8 @@
           Powered by <a href="https://github.com/SignalR/SignalR" target="_blank">SignalR</a>
         </div>
       </div>
-          <div style="clear: both">
-    </div>
+      
+      <div style="clear: both"></div>
     <nav>
       <ul id="tabs" role="tablist">
         <li id="tabs-lobby" class="current lobby" data-name="Lobby" role="tab">
@@ -243,7 +255,11 @@
       <ul id="messages-lobby" class="messages current" role="log">
       </ul>
       <form id="users-filter-form" action="#">
-      <input id="users-filter" class="filter" type="text" />
+        <input id="users-filter" class="filter" type="text" />
+        <label id="users-filter-closed-area">
+          <input id="users-filter-closed" type="checkbox" />
+          Show Closed Rooms?
+        </label>
       </form>
       <ul id="userlist-lobby" class="users current">
       </ul>
@@ -253,6 +269,7 @@
         <a class="toast" title="popup notifications" aria-haspopup="true"></a>
         <a class="download" title="download messages" aria-haspopup="true"></a>
         <a class="emotelist" title="emote list"></a>
+        <a class="help" title="display help" aria-haspopup="true"></a>
       </div>
       <form id="send-message" action="#">
       <div id="message-box">
@@ -264,6 +281,15 @@
       </div>
       </form>
     </div>
+    <% if (showReleaseDetails) { %>
+    <div id="releaseArea">
+        <p id="releaseTag">
+            Deployed from <a target="_blank" href="https://github.com/davidfowl/JabbR/commit/<%:sha %>" title="View the commit."><%:sha.Substring(0, 10) %></a>
+            on <a target="_blank" href="https://github.com/davidfowl/JabbR/branches/<%:branch %>" title="View the branch."><%:branch %></a> 
+            at <%:time %>.
+        </p>
+    </div>
+    <% } %>
     <audio src="Content/sounds/notification.wav" id="noftificationSound" hidden="hidden" aria-hidden="true">
     </audio>
     <section aria-hidden="true" aria-haspopup="true">
@@ -302,6 +328,30 @@
         </div>
       </div>
       <div id="emotelist-dialog" title="emote list"></div>
+      <div id="jabbr-help" class="modal hide fade">
+        <div class="modal-header">
+            <a class="close" data-dismiss="modal">&times;</a>
+            <h3>JabbR Help</h3>
+        </div>
+        <div class="modal-body">
+            <div class="help-body">
+                <div class="command-list">
+                    <h3>FAQ</h3>
+                    <p>Click on a user to send message.</p>
+                    <p>Type #roomname to create a link to a room</p>
+                    <p>Use #test for testing.</p>
+                </div>
+                <h3>Site wide shortcuts</h3>
+                <dl id="shortcut" class="command-list"></dl>
+                <h3>Site wide commands</h3>
+                <dl id="global" class="command-list"></dl>
+                <h3>Room commands</h3>
+                <dl id="room" class="command-list"></dl>
+                <h3>User commands</h3>
+                <dl id="user" class="command-list"></dl>
+            </div>
+        </div>
+      </div>
       <div id="jabbr-update" class="modal hide fade">
         <div class="modal-header">
           <a class="close" data-dismiss="modal">&times;</a>
@@ -326,37 +376,35 @@
     </section>
   </section> 
   <%= Bundle.JavaScript()
-            .Add("~/Scripts/jquery-1.7.min.js",
-                "~/Scripts/json2.min.js",
-                "~/Scripts/bootstrap.js",
-                "~/Scripts/jquery.KeyTips.js",
-                "~/Scripts/jquery-ui-1.8.17.min.js",
-                "~/Scripts/jquery.signalR-0.5.2.min.js")
-            //.ForceRelease()
+            .Add("~/Scripts/jquery-1.8.0.min.js")
+            .Add("~/Scripts/json2.min.js")
+            .Add("~/Scripts/bootstrap.js")
+            .Add("~/Scripts/jquery.KeyTips.js")
+            .Add("~/Scripts/jquery-ui-1.8.22.min.js")
+            .Add("~/Scripts/jquery.signalR-1.0.0-alpha2.min.js")
             .Render("~/Scripts/JabbR1_#.js")
   %>
   <script type="text/javascript" src='<%= ResolveClientUrl("~/signalr/hubs") %>'></script>
   <%= Bundle.JavaScript()
-            .Add("~/Scripts/jQuery.tmpl.min.js",
-                "~/Scripts/jquery.cookie.js",
-                "~/Scripts/jquery.autotabcomplete.js",
-                "~/Scripts/jquery.timeago.0.10.js",
-                "~/Scripts/jquery.captureDocumentWrite.min.js",
-                "~/Scripts/jquery.sortElements.js",
-                "~/Scripts/quicksilver.js",
-                "~/Scripts/jquery.livesearch.js",
-                "~/Scripts/Markdown.Converter.js",
-                "~/Scripts/jquery.history.js",
-                "~/Chat.utility.js",
-                "~/Chat.emoji.js",
-                "~/Chat.toast.js",
-                "~/Chat.ui.js",
-                "~/Chat.documentOnWrite.js",
-                "~/Chat.twitter.js",
-                "~/Chat.pinnedWindows.js",
-                "~/Chat.githubissues.js",
-                "~/Chat.js")
-            //.ForceRelease()
+            .Add("~/Scripts/jQuery.tmpl.min.js")
+            .Add("~/Scripts/jquery.cookie.js")
+            .Add("~/Scripts/jquery.autotabcomplete.js")
+            .Add("~/Scripts/jquery.timeago.0.10.js")
+            .Add("~/Scripts/jquery.captureDocumentWrite.min.js")
+            .Add("~/Scripts/jquery.sortElements.js")
+            .Add("~/Scripts/quicksilver.js")
+            .Add("~/Scripts/jquery.livesearch.js")
+            .Add("~/Scripts/Markdown.Converter.js")
+            .Add("~/Scripts/jquery.history.js")
+            .Add("~/Chat.utility.js")
+            .Add("~/Chat.emoji.js")
+            .Add("~/Chat.toast.js")
+            .Add("~/Chat.ui.js")
+            .Add("~/Chat.documentOnWrite.js")
+            .Add("~/Chat.twitter.js")
+            .Add("~/Chat.pinnedWindows.js")
+            .Add("~/Chat.githubissues.js")
+            .Add("~/Chat.js")
             .Render("~/Scripts/JabbR2_#.js")
   %>
 </body>

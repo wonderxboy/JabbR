@@ -16,14 +16,13 @@ using JabbR.Infrastructure;
 using JabbR.Models;
 using JabbR.Services;
 using JabbR.ViewModels;
+using Microsoft.AspNet.SignalR;
+using Microsoft.AspNet.SignalR.Hosting.Common;
+using Microsoft.AspNet.SignalR.Hubs;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Ninject;
 using RouteMagic;
-using SignalR;
-using SignalR.Hosting.Common;
-using SignalR.Hubs;
-using SignalR.Ninject;
 
 [assembly: WebActivator.PostApplicationStartMethod(typeof(JabbR.App_Start.Bootstrapper), "PreAppStart")]
 
@@ -51,16 +50,34 @@ namespace JabbR.App_Start
             var kernel = new StandardKernel();
 
             kernel.Bind<JabbrContext>()
-                .To<JabbrContext>()
-                .InRequestScope();
+                .To<JabbrContext>();
 
             kernel.Bind<IJabbrRepository>()
-                .To<CustomRepository>()
-                .InRequestScope();
+                .To<CustomRepository>();
+                //TODO fix InRequestScope()?
 
             kernel.Bind<IChatService>()
-                  .To<ChatService>()
-                  .InRequestScope();
+                  .To<ChatService>();
+
+            kernel.Bind<Chat>()
+                  .ToMethod(context =>
+                  {
+                      // We're doing this manually since we want the chat repository to be shared
+                      // between the chat service and the chat hub itself
+                      var settings = context.Kernel.Get<IApplicationSettings>();
+                      var resourceProcessor = context.Kernel.Get<IResourceProcessor>();
+                      var repository = context.Kernel.Get<IJabbrRepository>();
+                      var cache = context.Kernel.Get<ICache>();
+                      var crypto = context.Kernel.Get<ICryptoService>();
+
+                      var service = new ChatService(cache, repository, crypto);
+
+                      return new Chat(settings,
+                                      resourceProcessor,
+                                      service,
+                                      repository,
+                                      cache);
+                  });
 
             kernel.Bind<ICryptoService>()
                 .To<CryptoService>()
@@ -147,11 +164,6 @@ namespace JabbR.App_Start
         {
             try
             {
-                foreach (var u in repository.Users.Online())
-                {
-                    u.Status = (int)UserStatus.Offline;
-                }
-
                 repository.RemoveAllClients();
                 repository.CommitChanges();
             }
@@ -228,7 +240,7 @@ namespace JabbR.App_Start
         private static void MarkInactiveUsers(IJabbrRepository repo, IDependencyResolver resolver)
         {
             var connectionManager = resolver.Resolve<IConnectionManager>();
-            var clients = connectionManager.GetHubContext<Chat>().Clients;
+            var hubContext = connectionManager.GetHubContext<Chat>();
             var inactiveUsers = new List<ChatUser>();
 
             IQueryable<ChatUser> users = repo.Users.Online();
@@ -259,7 +271,7 @@ namespace JabbR.App_Start
 
                 foreach (var roomGroup in roomGroups)
                 {
-                    clients[roomGroup.Room.Name].markInactive(roomGroup.Users).Wait();
+                    hubContext.Clients.Group(roomGroup.Room.Name).markInactive(roomGroup.Users).Wait();
                 }
             }
         }

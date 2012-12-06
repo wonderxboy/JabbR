@@ -42,6 +42,7 @@ namespace JabbR.Models.Mapping
             this.Property(u => u.Email).HasColumnName("Email");
             this.Property(u => u.IsAdmin).HasColumnName("IsAdmin");
             this.Property(u => u.EmployeeId).HasColumnName("EmployeeId");
+            this.Property(u => u.IsBanned).HasColumnName("IsBanned");
         }
     }
 }

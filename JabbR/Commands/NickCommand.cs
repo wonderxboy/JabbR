@@ -7,7 +7,7 @@ using JabbR.Models;
 
 namespace JabbR.Commands
 {
-    [Command("nick", "Type /nick [user] [password] to create a user or change your nickname. You can change your password with /nick [user] [oldpassword] [newpassword]")]
+    [Command("nick", "Create a user or change your nickname or change your password.", "[user] [password] or [oldpassword] [newpassword]", "user")]
     public class NickCommand : ICommand
     {
         public void Execute(CommandContext context, CallerContext callerContext, string[] args)
@@ -51,6 +51,11 @@ namespace JabbR.Commands
                     }
                     else
                     {
+                        if (user.IsBanned)
+                        {
+                            throw new InvalidOperationException("You're banned, sorry.");
+                        }
+
                         // If there's no user but there's a password then authenticate the user
                         context.Service.AuthenticateUser(userName, password);
 

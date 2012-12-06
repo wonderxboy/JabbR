@@ -1574,7 +1574,7 @@ namespace JabbR.Test
                                                         cache,
                                                         notificationService.Object);
 
-                bool result = commandManager.TryHandleCommand("/help");
+                bool result = commandManager.TryHandleCommand("/?");
 
                 Assert.True(result);
                 notificationService.Verify(x => x.ShowHelp(), Times.Once());
@@ -1953,6 +1953,206 @@ namespace JabbR.Test
                 Assert.False(room.Users.Contains(user2));
                 Assert.False(user2.Rooms.Contains(room));
                 notificationService.Verify(x => x.KickUser(user2, room), Times.Once());
+            }
+        }
+
+
+        public class BanCommand
+        {
+            [Fact]
+            public void MissingUserNameThrows()
+            {
+                var repository = new InMemoryRepository();
+                var cache = new Mock<ICache>().Object;
+                var user = new ChatUser
+                {
+                    Name = "dfowler",
+                    Id = "1",
+                    IsAdmin = true
+                };
+                repository.Add(user);
+                var room = new ChatRoom
+                {
+                    Name = "room"
+                };
+                room.Users.Add(user);
+                room.Owners.Add(user);
+                user.Rooms.Add(room);
+                repository.Add(room);
+
+                var service = new ChatService(cache, repository, new Mock<ICryptoService>().Object);
+                var notificationService = new Mock<INotificationService>();
+                var commandManager = new CommandManager("clientid",
+                                                        "1",
+                                                        "room",
+                                                        service,
+                                                        repository,
+                                                        cache,
+                                                        notificationService.Object);
+
+                Assert.Throws<InvalidOperationException>(() => commandManager.TryHandleCommand("/ban"));
+            }
+
+            [Fact]
+            public void BannerIsNotAnAdminThrows()
+            {
+                var repository = new InMemoryRepository();
+                var cache = new Mock<ICache>().Object;
+                var user = new ChatUser
+                {
+                    Name = "dfowler",
+                    Id = "1"
+                };
+                var user2 = new ChatUser
+                {
+                    Name = "dfowler2",
+                    Id = "1"
+                };
+                repository.Add(user);
+                var room = new ChatRoom
+                {
+                    Name = "room"
+                };
+                room.Users.Add(user);
+                room.Owners.Add(user);
+                room.Users.Add(user2);
+                room.Owners.Add(user2);
+                user.Rooms.Add(room);
+                user2.Rooms.Add(room);
+                repository.Add(room);
+
+                var service = new ChatService(cache, repository, new Mock<ICryptoService>().Object);
+                var notificationService = new Mock<INotificationService>();
+                var commandManager = new CommandManager("clientid",
+                                                        "1",
+                                                        "room",
+                                                        service,
+                                                        repository,
+                                                        cache,
+                                                        notificationService.Object);
+
+                var ex = Assert.Throws<InvalidOperationException>(() => commandManager.TryHandleCommand("/ban dfowler2"));
+
+                Assert.True(ex.Message == "You are not an admin.");
+            }
+
+            [Fact]
+            public void CannotBanUserIfNotExists()
+            {
+                var repository = new InMemoryRepository();
+                var cache = new Mock<ICache>().Object;
+                var user = new ChatUser
+                {
+                    Name = "dfowler",
+                    Id = "1",
+                    IsAdmin = true
+                };
+                repository.Add(user);
+                var user2 = new ChatUser
+                {
+                    Name = "dfowler2",
+                    Id = "2"
+                };
+                repository.Add(user2);
+                var room = new ChatRoom
+                {
+                    Name = "room"
+                };
+                room.Users.Add(user);
+                room.Users.Add(user2);
+                room.Owners.Add(user);
+                user.Rooms.Add(room);
+                user2.Rooms.Add(room);
+                repository.Add(room);
+
+                var service = new ChatService(cache, repository, new Mock<ICryptoService>().Object);
+                var notificationService = new Mock<INotificationService>();
+                var commandManager = new CommandManager("clientid",
+                                                        "1",
+                                                        "room",
+                                                        service,
+                                                        repository,
+                                                        cache,
+                                                        notificationService.Object);
+
+                Assert.Throws<InvalidOperationException>(() => commandManager.TryHandleCommand("/ban fowler3"));
+            }
+
+            [Fact]
+            public void AdminCannotBanAdmin()
+            {
+                var repository = new InMemoryRepository();
+                var cache = new Mock<ICache>().Object;
+                var user = new ChatUser
+                {
+                    Name = "dfowler",
+                    Id = "1",
+                    IsAdmin = true
+                };
+                repository.Add(user);
+                var user2 = new ChatUser
+                {
+                    Name = "dfowler2",
+                    Id = "2",
+                    IsAdmin = true
+                };
+                repository.Add(user2);
+                var room = new ChatRoom
+                {
+                    Name = "room"
+                };
+                room.Users.Add(user);
+                room.Users.Add(user2);
+                room.Owners.Add(user);
+                user.Rooms.Add(room);
+                user2.Rooms.Add(room);
+                repository.Add(room);
+
+                var service = new ChatService(cache, repository, new Mock<ICryptoService>().Object);
+                var notificationService = new Mock<INotificationService>();
+                var commandManager = new CommandManager("clientid",
+                                                        "1",
+                                                        "room",
+                                                        service,
+                                                        repository,
+                                                        cache,
+                                                        notificationService.Object);
+
+                Assert.Throws<InvalidOperationException>(() => commandManager.TryHandleCommand("/ban dfowler2"));
+            }
+
+            [Fact]
+            public void CannotBanUrSelf()
+            {
+                var repository = new InMemoryRepository();
+                var cache = new Mock<ICache>().Object;
+                var user = new ChatUser
+                {
+                    Name = "dfowler",
+                    Id = "1",
+                    IsAdmin = true
+                };
+                repository.Add(user);
+                var room = new ChatRoom
+                {
+                    Name = "room"
+                };
+                room.Users.Add(user);
+                room.Owners.Add(user);
+                user.Rooms.Add(room);
+                repository.Add(room);
+
+                var service = new ChatService(cache, repository, new Mock<ICryptoService>().Object);
+                var notificationService = new Mock<INotificationService>();
+                var commandManager = new CommandManager("clientid",
+                                                        "1",
+                                                        "room",
+                                                        service,
+                                                        repository,
+                                                        cache,
+                                                        notificationService.Object);
+
+                Assert.Throws<InvalidOperationException>(() => commandManager.TryHandleCommand("/ban dfowler"));
             }
         }
 
