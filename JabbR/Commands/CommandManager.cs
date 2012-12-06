@@ -137,7 +137,8 @@ namespace JabbR.Commands
 
             ExpandCommand(_commandCache.Keys, ref commandName);
 
-            if(!_commandCache.TryGetValue(commandName, out command)) {
+            if (!_commandCache.TryGetValue(commandName, out command))
+            {
                 throw new CommandNotFoundException();
             }
         }
@@ -178,7 +179,9 @@ namespace JabbR.Commands
             try
             {
                 commandName = extended.Single();
-            } catch(InvalidOperationException) {
+            }
+            catch (InvalidOperationException)
+            {
                 throw new CommandAmbiguityException(extended);
             }
         }
