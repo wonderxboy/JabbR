@@ -82,6 +82,8 @@
 
                     d.resolveWith(chat);
 
+                    ui.scrollToBottom(room);
+
                     // Watch the messages after the defer, since room messages
                     // may be appended if we are just joining the room
                     ui.watchMessageScroll(messageIds, room);
@@ -163,7 +165,7 @@
             document.title = originalTitle;
         }
         else {
-            document.title =  (isUnreadMessageForUser ? '*' : '') + '(' + unread + ') ' + originalTitle;
+            document.title = (isUnreadMessageForUser ? '*' : '') + '(' + unread + ') ' + originalTitle;
         }
     }
 
