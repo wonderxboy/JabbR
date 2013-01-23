@@ -53,7 +53,8 @@ namespace JabbR.App_Start
                 .To<JabbrContext>();
 
             kernel.Bind<IJabbrRepository>()
-                .To<PersistedRepository>();
+                .To<InMemoryRepository>()
+                .InSingletonScope();
 
             kernel.Bind<IChatService>()
                   .To<ChatService>();
@@ -177,7 +178,8 @@ namespace JabbR.App_Start
             // Get the Jabbr connection string
             var connectionString = ConfigurationManager.ConnectionStrings["Jabbr"];
 
-            if (String.IsNullOrEmpty(connectionString.ProviderName) ||
+            if (connectionString == null ||
+                String.IsNullOrEmpty(connectionString.ProviderName) ||
                 !connectionString.ProviderName.Equals(SqlClient, StringComparison.OrdinalIgnoreCase))
             {
                 return;
