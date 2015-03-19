@@ -62,3 +62,6 @@ To perform your first build, grab the source, and open a visual studio command p
 
 #### Getting Involved
 We welcome contributions from experienced developers.  You can get involved by logging bugs in github, hacking on the source, or discussing issues / features in the [meta](https://jabbr.net/#/rooms/meta) room.
+
++#### Deploy to Azure
+<a href="https://azuredeploy.net/" target="_blank"><img src="http://azuredeploy.net/deploybutton.png"/></a>
