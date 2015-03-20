@@ -137,13 +137,12 @@ namespace JabbR
             {
                 "/",
                 "/*.js",
+                "/Scripts/**",
                 "/content/**",
                 "/account/**",
-                "/api/signalr/hubs",
-                "/api/authenticate/**",
+                "/signalr/**",
                 "/_Nancy/**",
                 "/favicon.ico",
-                "/api-docs/**"
             });
 
             app.RequiresStatelessAuth(new JwtTokenValidator(), new StatelessAuthOptions() { IgnorePaths = ignorePaths });
