@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Net.Http.Formatting;
 using System.Web.Http;
 using JabbR;
+using JabbR.Auth;
 using JabbR.Hubs;
 using JabbR.Infrastructure;
 using JabbR.Middleware;
@@ -18,12 +20,11 @@ using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.DataHandler;
 using Microsoft.Owin.Security.DataProtection;
-
 using Nancy.Owin;
-
 using Newtonsoft.Json.Serialization;
 using Ninject;
 using Owin;
+using Owin.StatelessAuth;
 
 [assembly: OwinStartup(typeof(Startup), "Configuration")]
 
@@ -132,6 +133,21 @@ namespace JabbR
                 Provider = kernel.Get<ICookieAuthenticationProvider>()
             });
 
+            var ignorePaths = new List<string>(new[]
+            {
+                "/",
+                "/*.js",
+                "/content/**",
+                "/account/**",
+                "/api/signalr/hubs",
+                "/api/authenticate/**",
+                "/_Nancy/**",
+                "/favicon.ico",
+                "/api-docs/**"
+            });
+
+            app.RequiresStatelessAuth(new JwtTokenValidator(), new StatelessAuthOptions() { IgnorePaths = ignorePaths });
+            
             app.Use(typeof(CustomAuthHandler));
 
             app.Use(typeof(WindowsPrincipalHandler));

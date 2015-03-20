@@ -81,6 +81,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Iesi.Collections.4.0.1.4000\lib\net40\Iesi.Collections.dll</HintPath>
     </Reference>
+    <Reference Include="JWT">
+      <HintPath>..\packages\JWT.1.3.2\lib\3.5\JWT.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.AspNet.SignalR.Core, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.2.1.0-pre-140513-b35\lib\net45\Microsoft.AspNet.SignalR.Core.dll</HintPath>
@@ -139,6 +142,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\WindowsAzure.Storage.2.1.0.3\lib\net40\Microsoft.WindowsAzure.Storage.dll</HintPath>
     </Reference>
+    <Reference Include="Minimatch">
+      <HintPath>..\packages\Owin.StatelessAuth.1.0.9\lib\net45\Minimatch.dll</HintPath>
+    </Reference>
     <Reference Include="Nancy, Version=0.20.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Nancy.0.20.0\lib\net40\Nancy.dll</HintPath>
@@ -174,6 +180,9 @@
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Owin.StatelessAuth">
+      <HintPath>..\packages\Owin.StatelessAuth.1.0.9\lib\net45\Owin.StatelessAuth.dll</HintPath>
     </Reference>
     <Reference Include="PagedList, Version=1.17.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -1117,6 +1126,8 @@
     <Content Include="Views\Home\status.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Auth\JwtToken.cs" />
+    <Compile Include="Auth\JwtTokenValidator.cs" />
     <Compile Include="Commands\CheckBannedCommand.cs" />
     <Compile Include="Commands\SpoilerCommand.cs" />
     <Compile Include="Commands\UnBanCommand.cs" />
