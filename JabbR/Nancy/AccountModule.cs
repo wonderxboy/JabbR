@@ -45,7 +45,7 @@ namespace JabbR.Nancy
                     return HttpStatusCode.Forbidden;
                 }
 
-                var secureDataFormat = new TicketDataFormat(DataProtectorSingleton.GetInstance().ProtectionProvider.Create());
+                var secureDataFormat = new TicketDataFormat(DataProtectorSingleton.GetInstance().Protector);
 
                 var props = new AuthenticationProperties()
                 {

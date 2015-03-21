@@ -10,11 +10,11 @@ namespace JabbR.Auth
     public class DataProtectorSingleton
     {
         private static DataProtectorSingleton instance;
-        public DpapiDataProtectionProvider ProtectionProvider {get; private set;}
+        public IDataProtector Protector { get; private set; }
 
         private DataProtectorSingleton()
         {
-            this.ProtectionProvider = new DpapiDataProtectionProvider("Jabbr");
+            this.Protector = new MachineKeyProtectionProvider().Create("Jabbr");
         }
 
         public static DataProtectorSingleton GetInstance()

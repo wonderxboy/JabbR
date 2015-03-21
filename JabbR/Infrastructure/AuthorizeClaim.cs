@@ -19,7 +19,7 @@ namespace JabbR.Infrastructure
 
         public override bool AuthorizeHubConnection(HubDescriptor hubDescriptor, IRequest request)
         {
-            var secureDataFormat = new TicketDataFormat(DataProtectorSingleton.GetInstance().ProtectionProvider.Create());
+            var secureDataFormat = new TicketDataFormat(DataProtectorSingleton.GetInstance().Protector);
             // authenticate by using bearer token in query string
             var token = request.QueryString.Get(SignalRTokenAuth.QueryStringKey);
             var ticket = secureDataFormat.Unprotect(token);
