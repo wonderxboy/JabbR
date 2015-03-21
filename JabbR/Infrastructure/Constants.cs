@@ -8,6 +8,11 @@ namespace JabbR.Infrastructure
         public static readonly string JabbRAuthType = "JabbR";
     }
 
+    public static class SignalRTokenAuth
+    {
+        public const string QueryStringKey = "token"; 
+    }
+
     public static class JabbRClaimTypes
     {
         public const string Identifier = "urn:jabbr:id";

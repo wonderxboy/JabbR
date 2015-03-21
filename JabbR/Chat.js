@@ -1248,7 +1248,7 @@
             ui.addNotificationToActiveRoom(welcomeMessages[i]);
         }
 
-        function initConnection() {
+        function initConnection(token) {
             var logging = $.cookie('jabbr.logging') === '1',
                 transport = $.cookie('jabbr.transport') || ['webSockets', 'serverSentEvents', 'longPolling'],
                 options = {};
@@ -1258,7 +1258,7 @@
             }
 
             connection.hub.logging = logging;
-            connection.hub.qs = "version=" + window.jabbrVersion;
+            connection.hub.qs = "version=" + window.jabbrVersion + "&token=" + token;
             connection.hub.start(options)
                           .done(function () {
 
@@ -1326,7 +1326,15 @@
             });
         }
 
-        initConnection();
+        $.getJSON("/account/tokenr/", function (token) {
+            if (token) {
+                console.log("init with token:" + token);
+                initConnection(token);
+            }
+            else {
+                console.error("No token found, give up!");
+            }
+        })
     });
 
 })(window.jQuery, window.jQuery.connection, window, window.chat.ui, window.chat.utility);

@@ -1051,6 +1051,7 @@
     <EmbeddedResource Include="Migrations\201310240539050_AddPrecision.resx">
       <DependentUpon>201310240539050_AddPrecision.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="Properties\PublishProfiles\colla.pubxml" />
     <None Include="Properties\PublishProfiles\TL2.pubxml" />
     <None Include="Scripts\jquery-2.0.3.intellisense.js" />
     <Content Include="Scripts\jquery-2.0.3.js" />
@@ -1126,6 +1127,7 @@
     <Content Include="Views\Home\status.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Auth\DataProtectorSingleton.cs" />
     <Compile Include="Auth\JwtToken.cs" />
     <Compile Include="Auth\JwtTokenValidator.cs" />
     <Compile Include="Commands\CheckBannedCommand.cs" />

@@ -10,6 +10,9 @@ using JabbR.Services;
 using JabbR.ViewModels;
 using JWT;
 using Nancy;
+using Microsoft.Owin.Security.DataProtection;
+using Microsoft.Owin.Security.DataHandler;
+using Microsoft.Owin.Security;
 
 namespace JabbR.Nancy
 {
@@ -62,6 +65,27 @@ namespace JabbR.Nancy
 
                 var token = JsonWebToken.Encode(jwttoken, "9E685A09933DC6F5F85ADC17FBF73F5B0402E292F67E87296D4A0F843B4299A3", JwtHashAlgorithm.HS256);
                 return Response.AsJson(token, HttpStatusCode.OK);
+            };
+
+            Get["/tokenr"] = _ =>
+            {
+                if (!IsAuthenticated)
+                {
+                    return HttpStatusCode.Forbidden;
+                }
+
+                var secureDataFormat = new TicketDataFormat(DataProtectorSingleton.GetInstance().ProtectionProvider.Create());
+
+                var props = new AuthenticationProperties()
+                {
+                    IssuedUtc = DateTime.UtcNow,
+                    ExpiresUtc = DateTime.UtcNow.Add(TimeSpan.FromDays(7)),
+                };
+
+                var identity = Principal.Identities.First();
+                var ticket = new AuthenticationTicket(identity, props);
+
+                return Response.AsJson(secureDataFormat.Protect(ticket), HttpStatusCode.OK);
             };
 
             Get["/login"] = _ =>
