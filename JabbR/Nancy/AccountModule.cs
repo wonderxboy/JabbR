@@ -8,7 +8,6 @@ using JabbR.Infrastructure;
 using JabbR.Models;
 using JabbR.Services;
 using JabbR.ViewModels;
-using JWT;
 using Nancy;
 using Microsoft.Owin.Security.DataProtection;
 using Microsoft.Owin.Security.DataHandler;
@@ -37,34 +36,6 @@ namespace JabbR.Nancy
                 ChatUser user = repository.GetUserById(Principal.GetUserId());
 
                 return GetProfileView(authService, user);
-            };
-
-            Get["/token"] = _ =>
-            {
-                if (!IsAuthenticated)
-                {
-                    return HttpStatusCode.Forbidden;
-                }
-
-                //TODO: get current user name
-                var username = this.Context.CurrentUser.UserName;
-                username = username ?? "Test";
-
-                var jwttoken = new JwtToken()
-                {
-                    Issuer = "http://issuer.com",
-                    Audience = "http://mycoolwebsite.com",
-                    Claims =
-                        new List<Claim>(new[]
-                        {
-                            new Claim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", "Administrator"),
-                            new Claim(ClaimTypes.Name, username)
-                        }),
-                    Expiry = DateTime.UtcNow.AddDays(7)
-                };
-
-                var token = JsonWebToken.Encode(jwttoken, "9E685A09933DC6F5F85ADC17FBF73F5B0402E292F67E87296D4A0F843B4299A3", JwtHashAlgorithm.HS256);
-                return Response.AsJson(token, HttpStatusCode.OK);
             };
 
             Get["/tokenr"] = _ =>

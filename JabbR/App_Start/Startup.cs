@@ -24,7 +24,6 @@ using Nancy.Owin;
 using Newtonsoft.Json.Serialization;
 using Ninject;
 using Owin;
-using Owin.StatelessAuth;
 
 [assembly: OwinStartup(typeof(Startup), "Configuration")]
 
@@ -133,20 +132,6 @@ namespace JabbR
                 Provider = kernel.Get<ICookieAuthenticationProvider>()
             });
 
-            var ignorePaths = new List<string>(new[]
-            {
-                "/",
-                "/*.js",
-                "/Scripts/**",
-                "/content/**",
-                "/account/**",
-                "/signalr/**",
-                "/_Nancy/**",
-                "/favicon.ico",
-            });
-
-            app.RequiresStatelessAuth(new JwtTokenValidator(), new StatelessAuthOptions() { IgnorePaths = ignorePaths });
-            
             app.Use(typeof(CustomAuthHandler));
 
             app.Use(typeof(WindowsPrincipalHandler));
