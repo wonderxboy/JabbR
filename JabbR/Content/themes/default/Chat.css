@@ -153,17 +153,14 @@ form#send-message {
 }
 
     .banner h1 {
-        margin-top: 0;
+        margin: 0;
         line-height: normal;
+        font-weight:600;
         font-size: 25px;
-        margin-bottom: 0;
         background-color: #fae905;
         color: #424143;
         text-align: right;
-        padding-top: 6px;
-        padding-right: 6px;
-        padding-left: 30px;
-        padding-bottom: 5px;
+        padding: 20px;
 }
 
 .reload-message {
@@ -235,7 +232,7 @@ form#send-message {
 .roomTopic {
     position: absolute;
     top: 44px;
-    left: 98px;
+    left: 150px;
     right: 125px;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -332,6 +329,7 @@ canvas {
 }
 
 #userlist-lobby,
+#documentlist-lobby,
 #userlist-lobby-owners {
     position: relative;
     margin: 0 5px;
@@ -339,7 +337,8 @@ canvas {
     background: none;
 }
 
-    #userlist-lobby li {
+    #userlist-lobby li,
+    #documentlist-lobby li {
         display: block;
         animation: room-fade 0.8s linear 1;
         -webkit-animation: room-fade 0.8s linear 1;
@@ -387,7 +386,8 @@ canvas {
         }
 
 
-    #userlist-lobby div.room-row {
+    #userlist-lobby div.room-row,
+    #documentlist-lobby div.room-row {
         min-height: 30px;
         border-color: #EEEEEE;
         border-style: solid;
@@ -397,7 +397,8 @@ canvas {
         padding-left: 15px;
     }
 
-    #userlist-lobby div:hover {
+    #userlist-lobby div:hover,
+    #documentlist-lobby div:hover {
         background: #f3f1e7;
         color: #424143;
         color: rgba(0, 16, 63, 1);
@@ -457,6 +458,7 @@ canvas {
 }
 
 #userlist-lobby .name,
+#documentlist-lobby .name,
 #userlist-lobby-owners .name {
     font-size: 1.25em;
     overflow: hidden;
@@ -466,6 +468,7 @@ canvas {
 }
 
 #userlist-lobby .count,
+#documentlist-lobby .count,
 #userlist-lobby-owners .count {
     font-style: italic;
     color: #424143;
@@ -475,6 +478,7 @@ canvas {
 }
 
 #userlist-lobby .topic,
+#documentlist-lobby .topic,
 #userlist-lobby-owners .topic {
     font-size: 1em;
     overflow: hidden;
@@ -661,8 +665,7 @@ li.user.typing .gravatar {
 
 #tabs {
     padding: 0;
-    margin: 0 200px 0 0;
-    left: 90px;
+    left: 98px;
     right: 0;
     position: absolute;
     z-index: 200;
@@ -3348,11 +3351,14 @@ h3.userlist-header {
     padding-top: 15%;
 }
 
-.jabbr-splash-logo {
-    height: 300px;
+.splash-logo {
+    height: 200px;
     width: 350px;
-    background: url('../../images/splash-logo.png') no-repeat left center;
     margin: 0 auto;
+    background:#fae905;
+    font-size: 5em;
+    line-height: 2.5em;
+    text-align: center;
 }
 
 .progress-wrapper {

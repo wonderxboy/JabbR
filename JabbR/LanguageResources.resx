@@ -1230,4 +1230,16 @@ Use ? or type /? to display the FAQ and list of commands.</value>
   <data name="Client_Home" xml:space="preserve">
     <value>Home</value>
   </data>
+  <data name="CLient_Documents" xml:space="preserve">
+    <value>Documents</value>
+  </data>
+  <data name="Client_ParticipantMany" xml:space="preserve">
+    <value>{0} participants</value>
+  </data>
+  <data name="Client_ParticipantOne" xml:space="preserve">
+    <value>1 participant</value>
+  </data>
+  <data name="Client_ParticipantZero" xml:space="preserve">
+    <value>0 participant</value>
+  </data>
 </root>

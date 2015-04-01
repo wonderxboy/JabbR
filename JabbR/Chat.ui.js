@@ -826,6 +826,7 @@
                 commandhelp: $('#command-help-template'),
                 multiline: $('#multiline-content-template'),
                 lobbyroom: $('#new-lobby-room-template'),
+                lobbydocument: $('#new-lobby-document-template'),
                 otherlobbyroom: $('#new-other-lobby-room-template'),
                 commandConfirm: $('#command-confirm-template')
             };
@@ -1580,6 +1581,15 @@
                     $loadMoreRooms.show();
                 }
                 $lobbyOtherRooms.show();
+
+                //TOOD:load document from API
+
+                var documentListLobby = $('#documentlist-lobby');
+                var listOfDocuments = $('<ul/>');
+                var documentList = [{ 'id': '878XT1YtTH', 'name': 'Pitch Brainstrom', 'count': 4 },
+                    { 'id': 'DpfVMMrnEx', 'name': 'Feature Planning', 'count': 6 }];
+                populateLobbyRoomList(documentList, templates.lobbydocument, listOfDocuments);
+                listOfDocuments.children('li').appendTo(documentListLobby);
             }
 
             if (lobby.isActive()) {

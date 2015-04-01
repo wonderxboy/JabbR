@@ -100,7 +100,7 @@
         <li class="room {{if Private}}locked{{/if}} {{if Closed}}closed{{/if}}" data-room="${Name}" data-name="${Name}" data-count="${Count}">
             <div class="row-fluid room-row">
                 <div class="span3">
-                    <span class="name">${Name}</span>
+                    <span class="name">#${Name}</span>
                     <span class="lock"><i class="icon-lock"></i></span>
                     <span class="readonly"><i class="icon-ban-circle"></i></span>
                 </div>
@@ -115,6 +115,28 @@
                         @LanguageResources.Client_OccupantsOne
                         {{else}}
                         @String.Format(LanguageResources.Client_OccupantsMany, "${Count}")
+                        {{/if}}
+                    </span>
+                </div>
+            </div>
+        </li>
+    </script>
+    <script id="new-lobby-document-template" type="text/x-jquery-tmpl">
+        <li class="room document" data-document="${name}" data-document-id="${id}" >
+            <div class="row-fluid room-row">
+                <div class="span3">
+                    <span class="name">>${name}</span>
+                </div>
+                <div class="span4">
+                </div>
+                <div class="span2">
+                    <span class="count">
+                        {{if count == 0}}
+                        @LanguageResources.Client_ParticipantZero
+                        {{else count == 1}}
+                        @LanguageResources.Client_ParticipantOne
+                        {{else}}
+                        @String.Format(LanguageResources.Client_ParticipantMany, "${count}")
                         {{/if}}
                     </span>
                 </div>
@@ -360,14 +382,10 @@
                 <ul id="messages-lobby" class="messages current" role="log" style="visibility: hidden;">
                 </ul>
                 <div id="lobby-documents">
-                    <ul>
-                        <li>
-                            <a class="document-link" data-document-id="878XT1YtTH" href="#">Pitch Document</a>
-                        </li>
-                        <li>
-                            <a class="document-link" data-document-id="DpfVMMrnEx" href="#">Freature Planning</a>
-                        </li>
-                    </ul>
+                    <h3 class="userlist-header nav-header">
+                        <span class="list-name">@LanguageResources.CLient_Documents</span>
+                    </h3>
+                    <ul id="documentlist-lobby"></ul>
                 </div>
                 <div id="document-tab">
 
@@ -474,12 +492,7 @@
                 <i class="icon-spinner icon-spin"></i> @LanguageResources.Client_LoadingPreviousMessages
             </div>
             <div id="splash-screen" class="splash-screen-overlay">
-                <div class="jabbr-splash-logo"></div>
-                <div class="progress-wrapper" style="text-align: center;">
-                    <div class="progress progress-striped active">
-                        <div id="progress-bar" class="bar" style="width: 100%;"></div>
-                    </div>
-                </div>
+                <div class="splash-logo">Collara</div>
             </div>
             <div id="jabbr-upload-preview" class="modal hide fade">
                 <div class="modal-header">

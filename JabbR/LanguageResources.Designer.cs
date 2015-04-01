@@ -1721,6 +1721,15 @@ namespace JabbR {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Documents.
+        /// </summary>
+        public static string CLient_Documents {
+            get {
+                return ResourceManager.GetString("CLient_Documents", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Download.
         /// </summary>
         public static string Client_Download {
@@ -1927,6 +1936,33 @@ namespace JabbR {
         public static string Client_OtherRooms {
             get {
                 return ResourceManager.GetString("Client_OtherRooms", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} participants.
+        /// </summary>
+        public static string Client_ParticipantMany {
+            get {
+                return ResourceManager.GetString("Client_ParticipantMany", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 1 participant.
+        /// </summary>
+        public static string Client_ParticipantOne {
+            get {
+                return ResourceManager.GetString("Client_ParticipantOne", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 0 participant.
+        /// </summary>
+        public static string Client_ParticipantZero {
+            get {
+                return ResourceManager.GetString("Client_ParticipantZero", resourceCulture);
             }
         }
         
