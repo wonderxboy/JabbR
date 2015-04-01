@@ -1787,6 +1787,15 @@ namespace JabbR {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Home.
+        /// </summary>
+        public static string Client_Home {
+            get {
+                return ResourceManager.GetString("Client_Home", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Jabbr Error.
         /// </summary>
         public static string Client_JabbrError {
