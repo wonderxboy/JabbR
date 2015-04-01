@@ -2675,6 +2675,21 @@ h3.userlist-header {
             background-color: #e5e5e5;
         }
 
+.modal.document-workspace {
+    width: 80%;
+    height: 80%;
+    margin-left: -40%;
+}
+
+.modal.document-workspace .modal-body{
+    max-height: 90%;
+}
+
+
+.modal.document-workspace .modal-header .close{
+    font-size: 1.8em;
+}
+
 .modal, .modal-header {
     line-height: normal;
 }

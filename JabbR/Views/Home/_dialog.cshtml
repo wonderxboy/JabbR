@@ -2,6 +2,15 @@
 @model SettingsViewModel
 
 <section id="dialog-container" aria-hidden="true" aria-haspopup="true">
+    <div id="document-dialog" class="modal hide fade document-workspace">
+        <div class="modal-header">
+            <a class="close" data-dismiss="modal">&times;</a>
+            <h2 class="title"></h2>
+        </div>
+        <div class="modal-body">
+            <div id="remote-document"></div>
+        </div>
+    </div>
     <div id="disconnect-dialog" class="modal hide fade">
         <div class="modal-header">
             <a class="close" data-dismiss="modal">&times;</a>

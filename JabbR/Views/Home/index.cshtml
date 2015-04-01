@@ -124,7 +124,7 @@
         </li>
     </script>
     <script id="new-lobby-document-template" type="text/x-jquery-tmpl">
-        <li class="room document" data-document="${name}" data-document-id="${id}" >
+        <li class="room document" data-document-name="${name}" data-document-id="${id}" >
             <div class="row-fluid room-row">
                 <div class="span3">
                     <span class="name">>${name}</span>
@@ -469,22 +469,6 @@
             .Add("~/JabbrScript.js")
             .Render("~/Scripts/JabbR2_#.js"));
     }
-    <script type="text/javascript">
-        $(document).ready(function(){
-
-            var documentHost = "http://colladox.cloudapp.net/";
-            var baseUri = "p/";
-            var documentLoader = new doc.loader(documentHost, baseUri);
-            //TODO: load current user name
-            documentLoader.username = "Mike";
-            var extraParam = { 'height': 400 };;
-            $('.document-link').click(function (event) {
-                var documentId = $(event.target).attr('data-document-id');
-                
-                documentLoader.load("#document-tab", documentId, extraParam);
-            });
-        });
-    </script>
 
     @if (Model.DebugMode)
     {

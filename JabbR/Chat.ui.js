@@ -890,10 +890,38 @@
                     $ui.trigger(ui.events.openRoom, [roomName]);
                 }
             };
-            
-            $document.on('click', 'li.room .room-row', function () {
-                var roomName = $(this).parent().data('name');
-                activateOrOpenRoom(roomName);
+            var getDocumentLoader = function () {
+                var documentHost = "http://colladox.cloudapp.net/";
+                var baseUri = "p/";
+                var docLoader = new doc.loader(documentHost, baseUri);
+                docLoader.username = ui.getUserName();
+
+                return docLoader;
+            };
+
+            var documentLoader = getDocumentLoader();
+
+            $document.on('click', 'li.room .room-row', function (event) {
+                var categoryId = $(this).closest('ul').attr('id');
+
+                if (categoryId == 'documentlist-lobby') {
+
+                    var documentId = $(this).parent().attr('data-document-id');
+                    var documentName = $(this).parent().attr('data-document-name');
+                    var titleElement = $('#document-dialog').find('.title')[0];
+                    if (titleElement) {
+                        $(titleElement).text(documentName);
+                    }
+
+                    var height = $(document).height() * 0.65;
+
+                    $('#document-dialog').modal();
+                    documentLoader.load("#remote-document", documentId, { 'height': height, 'hideQRCode': false });
+                }
+                else {
+                    var roomName = $(this).parent().data('name');
+                    activateOrOpenRoom(roomName);
+                }
             });
             
             $roomFilterInput.keypress(function (ev) {
@@ -1363,7 +1391,6 @@
                 ui.trimRoomMessageHistory();
             }, trimRoomHistoryFrequency);
         },
-        
         run: function () {
             $.history.init(function (hash) {
                 var roomName = getRoomNameFromHash(hash);
@@ -2538,7 +2565,7 @@
         },
         hideSplashScreen: function () {
             $splashScreen.fadeOut('slow');
-        }
+        },
     };
 
     if (!window.chat) {
