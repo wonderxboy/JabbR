@@ -1796,7 +1796,7 @@ namespace JabbR {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to JabbR Help.
+        ///   Looks up a localized string similar to Collara Help.
         /// </summary>
         public static string Client_Help {
             get {

@@ -1119,6 +1119,7 @@
     <Content Include="Views\Account\resetpasswordsuccess.cshtml" />
     <Content Include="Scripts\jquery-2.0.3.min.map" />
     <Content Include="Views\Home\status.cshtml" />
+    <Content Include="Views\Home\_dialog.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Auth\DataProtectorSingleton.cs" />

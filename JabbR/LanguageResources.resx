@@ -397,7 +397,7 @@
 &lt;p&gt;To use a command, enter it into the chat message textbox.&lt;/p&gt;</value>
   </data>
   <data name="Client_Help" xml:space="preserve">
-    <value>JabbR Help</value>
+    <value>Collara Help</value>
   </data>
   <data name="Client_JabbrError" xml:space="preserve">
     <value>Jabbr Error</value>
