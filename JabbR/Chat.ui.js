@@ -894,8 +894,6 @@
                 var documentHost = "http://colladox.cloudapp.net/";
                 var baseUri = "p/";
                 var docLoader = new doc.loader(documentHost, baseUri);
-                docLoader.username = ui.getUserName();
-
                 return docLoader;
             };
 
@@ -916,7 +914,7 @@
                     var height = $(document).height() * 0.65;
 
                     $('#document-dialog').modal();
-                    documentLoader.load("#remote-document", documentId, { 'height': height, 'hideQRCode': false });
+                    documentLoader.load("#remote-document", documentId, { 'userName': ui.getUserName(), 'height': height, 'hideQRCode': false });
                 }
                 else {
                     var roomName = $(this).parent().data('name');
