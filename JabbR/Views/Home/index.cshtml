@@ -334,7 +334,7 @@
         </header>
         <div id="chat-area" role="tabpanel">
             <form id="room-filter-form" action="#" class="form-inline">
-                <input id="room-filter" class="filter input-xlarge" type="text" placeholder="@LanguageResources.Client_RoomFilterInstruction" />
+                <input id="room-filter" class="filter input-xlarge" type="text" placeholder="@LanguageResources.Client_FilterAllInstruction" />
                 <label id="room-filter-closed-area" class="checkbox inline">
                     <input id="room-filter-closed" type="checkbox" />
                     @LanguageResources.Client_ShowClosedRooms
@@ -359,6 +359,19 @@
                 </div>
                 <ul id="messages-lobby" class="messages current" role="log" style="visibility: hidden;">
                 </ul>
+                <div id="lobby-documents">
+                    <ul>
+                        <li>
+                            <a class="document-link" data-document-id="878XT1YtTH" href="#">Pitch Document</a>
+                        </li>
+                        <li>
+                            <a class="document-link" data-document-id="DpfVMMrnEx" href="#">Freature Planning</a>
+                        </li>
+                    </ul>
+                </div>
+                <div id="document-tab">
+
+                </div>
             </div>
             <div id="drop-file-target"><h1 class="drop-file-text">@LanguageResources.Client_UploadDropTarget</h1></div>
             <iframe id="upload-frame" name="upload-frame" style="position:absolute;top:0;left:0;width:0;height:0;visibility:hidden;"></iframe>
@@ -523,6 +536,7 @@
             .Add("~/Scripts/jquery.history.js")
             .Add("~/Scripts/moment.min.js")
             .Add("~/Scripts/livestamp.min.js")
+            .Add("~/Scripts/jquery.etherpad.js")
             .Add("~/Chat.emoji.js")
             .Add("~/Chat.utility.js")
             .Add("~/Chat.toast.js")
@@ -534,8 +548,26 @@
             .Add("~/Chat.githubissues.js")
             .Add("~/Chat.js")
             .Add("~/loader.js")
+            .Add("~/JabbrScript.js")
             .Render("~/Scripts/JabbR2_#.js"));
     }
+    <script type="text/javascript">
+        $(document).ready(function(){
+
+            var documentHost = "http://colladox.cloudapp.net/";
+            var baseUri = "p/";
+            var documentLoader = new doc.loader(documentHost, baseUri);
+            //TODO: load current user name
+            documentLoader.username = "Mike";
+            var extraParam = { 'height': 400 };;
+            $('.document-link').click(function (event) {
+                var documentId = $(event.target).attr('data-document-id');
+                
+                documentLoader.load("#document-tab", documentId, extraParam);
+            });
+        });
+    </script>
+
     @if (Model.DebugMode)
     {
     @*<script type="text/javascript" src="@Url.Content("~/Scripts/jquery.network.mock.js")"></script>*@

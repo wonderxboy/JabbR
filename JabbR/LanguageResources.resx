@@ -1224,6 +1224,9 @@ Use ? or type /? to display the FAQ and list of commands.</value>
   <data name="Client_EmoteList" xml:space="preserve">
     <value>Emote List</value>
   </data>
+  <data name="Client_FilterAllInstruction" xml:space="preserve">
+    <value>Find what you want from here...</value>
+  </data>
   <data name="Client_Home" xml:space="preserve">
     <value>Home</value>
   </data>

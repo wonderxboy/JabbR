@@ -1778,6 +1778,15 @@ namespace JabbR {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Find what you want from here....
+        /// </summary>
+        public static string Client_FilterAllInstruction {
+            get {
+                return ResourceManager.GetString("Client_FilterAllInstruction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to JabbR Help.
         /// </summary>
         public static string Client_Help {

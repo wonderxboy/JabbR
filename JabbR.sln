@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30723.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JabbR", "JabbR\JabbR.csproj", "{16204F16-6354-4B68-BB0F-1A4F109FC92B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JabbR.Tests", "JabbR.Tests\JabbR.Tests.csproj", "{45AB4285-8B37-47FD-9D38-40E6BC5D2E13}"
@@ -35,6 +37,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{F8B28AB9
 		Build\MSBuild.Community.Tasks.dll = Build\MSBuild.Community.Tasks.dll
 		Build\MSBuild.Community.Tasks.targets = Build\MSBuild.Community.Tasks.targets
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jabbr.Scripts", "Jabbr.Scripts\Jabbr.Scripts.csproj", "{DDF35370-D0FF-41F8-8B60-AC5E2944E4F8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -96,6 +100,16 @@ Global
 		{3786FC2E-7FC9-43EC-B137-41B070DE37D8}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{3786FC2E-7FC9-43EC-B137-41B070DE37D8}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{3786FC2E-7FC9-43EC-B137-41B070DE37D8}.Release|x86.ActiveCfg = Release|Any CPU
+		{DDF35370-D0FF-41F8-8B60-AC5E2944E4F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DDF35370-D0FF-41F8-8B60-AC5E2944E4F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DDF35370-D0FF-41F8-8B60-AC5E2944E4F8}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{DDF35370-D0FF-41F8-8B60-AC5E2944E4F8}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{DDF35370-D0FF-41F8-8B60-AC5E2944E4F8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DDF35370-D0FF-41F8-8B60-AC5E2944E4F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DDF35370-D0FF-41F8-8B60-AC5E2944E4F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DDF35370-D0FF-41F8-8B60-AC5E2944E4F8}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{DDF35370-D0FF-41F8-8B60-AC5E2944E4F8}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{DDF35370-D0FF-41F8-8B60-AC5E2944E4F8}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

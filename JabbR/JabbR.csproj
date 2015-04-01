@@ -973,6 +973,7 @@
     <Content Include="Content\images\logo32.png" />
     <Content Include="Content\images\small-logo.png" />
     <Content Include="Content\sounds\notification.wav" />
+    <Content Include="JabbrScript.js" />
     <Content Include="loader.js" />
     <Content Include="notifications.js" />
     <Content Include="notifications.unreadcounter.js" />
@@ -1046,6 +1047,7 @@
     <None Include="Properties\PublishProfiles\colla.pubxml" />
     <None Include="Properties\PublishProfiles\TL2.pubxml" />
     <None Include="Scripts\jquery-2.0.3.intellisense.js" />
+    <Content Include="Scripts\jquery.etherpad.js" />
     <Content Include="Scripts\jquery-2.0.3.js" />
     <Content Include="Scripts\jquery-2.0.3.min.js" />
     <Content Include="Scripts\jquery-migrate-1.2.1.min.js" />
