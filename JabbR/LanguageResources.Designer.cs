@@ -133,6 +133,15 @@ namespace JabbR {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Forgot password?.
+        /// </summary>
+        public static string Account_ForgetPassword {
+            get {
+                return ResourceManager.GetString("Account_ForgetPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Identity Providers.
         /// </summary>
         public static string Account_IdentityProviders {
@@ -303,6 +312,24 @@ namespace JabbR {
         public static string Account_SignIn {
             get {
                 return ResourceManager.GetString("Account_SignIn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Jump in to see it in action..
+        /// </summary>
+        public static string Account_SignInSlogan {
+            get {
+                return ResourceManager.GetString("Account_SignInSlogan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sign up.
+        /// </summary>
+        public static string Account_SignUp {
+            get {
+                return ResourceManager.GetString("Account_SignUp", resourceCulture);
             }
         }
         
@@ -3135,6 +3162,15 @@ namespace JabbR {
         public static string SettingsSaveSuccess {
             get {
                 return ResourceManager.GetString("SettingsSaveSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Collara.
+        /// </summary>
+        public static string SiteName {
+            get {
+                return ResourceManager.GetString("SiteName", resourceCulture);
             }
         }
         

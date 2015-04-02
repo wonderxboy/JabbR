@@ -1,55 +1,42 @@
 ﻿@using JabbR;
 @{
-    Layout = "_layout.cshtml";
+    Layout = "_layoutTheme2.cshtml";
+    ViewBag.Title = String.Format("{0} | {1}", LanguageResources.SiteName, LanguageResources.Account_Register);
 }
-<div class="row-fluid">
-    <div class="span6 offset3">
-        <div class="user-registration">
-            <form class="form-horizontal" action="@Url.Content("~/account/create" + Html.RequestQuery())" method="post">
-                @Html.ValidationSummary()
-                <div class="control-group">
-                    <div class="controls">
-                        <div class="input-prepend">
-                            <span class="add-on"><i class="icon-user"></i></span>
-                            @Html.TextBox("username", "input-block-level", @LanguageResources.Account_UserName)
-                        </div>
-                    </div>
-                </div>
-                <div class="control-group">
-                    <div class="controls">
-                        <div class="input-prepend">
-                            <span class="add-on"><i class="icon-envelope"></i></span>
-                            @Html.TextBox("email", "input-block-level", @LanguageResources.Account_Email)
-                        </div>
-                    </div>
-                </div>
-                @if (ViewBag.requirePassword) 
-                {
-                <div class="control-group">
-                    <div class="controls">
-                        <div class="input-prepend">
-                            <span class="add-on"><i class="icon-lock"></i></span>
-                            @Html.Password("password", "input-block-level", @LanguageResources.Account_Pass)
-                        </div>
-                    </div>
-                </div>
-                <div class="control-group">
-                    <div class="controls">
-                        <div class="input-prepend">
-                            <span class="add-on"><i class="icon-lock"></i></span>
-                            @Html.Password("confirmPassword", "input-block-level", @LanguageResources.Account_PassConfirm)
-                        </div>
-                    </div>
-                </div>
-                }
-                <div class="control-group">
-                    <div class="controls">
-                        <button type="submit" class="btn">@LanguageResources.Account_Register</button>
-                        <a href="@Url.Content("~/account/login" + Html.RequestQuery())" class="btn">@LanguageResources.Account_Cancel</a>
-                    </div>
-                </div>
-                @Html.AntiForgeryToken()
-            </form>
-        </div>
+
+<div>
+    <div>
+        <h1 class="logo-name" style="font-size:5em;letter-spacing:normal;">@LanguageResources.SiteName</h1>
     </div>
+
+    <h3>@LanguageResources.Account_SignUp</h3>
+    <p>@LanguageResources.Account_SignInSlogan</p>
+    <form class="m-t" role="form" action="@Url.Content("~/account/create" + Html.RequestQuery())" method="post">
+        @Html.ValidationSummary()
+        <div class="form-group">
+            @Html.TextBox("username", "form-control", LanguageResources.Account_UserName)
+        </div>
+        <div class="form-group">
+            @Html.TextBox("email", "form-control", LanguageResources.Account_Email)
+        </div>
+        @if (ViewBag.requirePassword)
+        {
+        <div class="form-group">
+            @Html.Password("password", "form-control", LanguageResources.Account_Pass)
+        </div>
+        <div class="form-group">
+            @Html.Password("confirmPassword", "form-control", LanguageResources.Account_PassConfirm)
+        </div>
+        }
+        <div class="form-group">
+            <div class="checkbox"><label> <input type="checkbox"><i></i> Agree the terms and policy </label></div>
+        </div>
+
+        <button type="submit" class="btn btn-primary block full-width m-b">@LanguageResources.Account_Register</button>
+
+        <p class="text-muted text-center"><small>Already have an account?</small></p>
+        <a class="btn btn-sm btn-white btn-block" href="@Url.Content("~/account/login")">Sign in</a>
+        @Html.AntiForgeryToken()
+</form>
+    <p class="m-t"> <small>@LanguageResources.SiteName &copy; 2015</small> </p>
 </div>

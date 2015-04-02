@@ -1,17 +1,26 @@
-﻿@using JabbR.ViewModels;
+﻿@using JabbR;
+@using JabbR.ViewModels;
 @using System.Linq;
 @model LoginViewModel
+
 @{
-    Layout = "_layout.cshtml"; 
+    Layout = "_layoutTheme2.cshtml";
+    ViewBag.Title = String.Format("{0} | {1}", LanguageResources.SiteName, LanguageResources.Account_SignIn);
     var hasSocialProviders = Model.SocialDetails.ConfiguredProviders.Any();
 }
 
-<div class="row-fluid">
-    <div class="span6 @if (!hasSocialProviders) {<text>offset3</text>}">
-        <div class="usernamepassword-auth @if(hasSocialProviders) {<text>auth-divider</text>}">
-          @Html.Partial("_username", Model)
-        </div>
+<div>
+    <div>
+        <h1 class="logo-name" style="font-size:5em;letter-spacing:normal;">@LanguageResources.SiteName</h1>
     </div>
+    <h3>Welcome to @LanguageResources.SiteName</h3>
+    <p>@LanguageResources.Account_SignInSlogan</p>
+    @Html.Partial("_username", Model)
+    <p class="m-t"> <small>@LanguageResources.SiteName &copy; 2015</small> </p>
+</div>
+
+
+@*
     @if (hasSocialProviders)
     {
       <div class="span6">
@@ -20,4 +29,4 @@
           </div>
       </div>
     }
-</div>
+*@

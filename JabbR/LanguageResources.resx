@@ -1242,4 +1242,16 @@ Use ? or type /? to display the FAQ and list of commands.</value>
   <data name="Client_ParticipantZero" xml:space="preserve">
     <value>0 participant</value>
   </data>
+  <data name="Account_ForgetPassword" xml:space="preserve">
+    <value>Forgot password?</value>
+  </data>
+  <data name="Account_SignInSlogan" xml:space="preserve">
+    <value>Jump in to see it in action.</value>
+  </data>
+  <data name="Account_SignUp" xml:space="preserve">
+    <value>Sign up</value>
+  </data>
+  <data name="SiteName" xml:space="preserve">
+    <value>Collara</value>
+  </data>
 </root>
