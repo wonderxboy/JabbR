@@ -38,6 +38,12 @@ namespace JabbR.Nancy
                         MaxMessageLength = settings.MaxMessageLength
                     };
 
+                    var user =  jabbrRepository.GetUserById(Principal.GetUserId());
+                    if (user != null && !string.IsNullOrEmpty(user.Name))
+                    {
+                        this.ViewBag.Username =user.Name;
+                    }
+
                     return View["index", viewModel];
                 }
 
