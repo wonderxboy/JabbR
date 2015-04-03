@@ -30,7 +30,7 @@
             .Add("~/Content/ponymoticon.css")
             .Add("~/Content/hotgluemoticon.css")
             .Add("~/Content/themes/smoothness/jquery-ui-1.10.3.custom.min.css")
-            .Render("~/Content/JabbR_#.css"));
+            .Render("~/Content/collara_#.css"));
    }
 
    @Html.Partial("_tracking", @currentModel)
@@ -365,10 +365,10 @@
             .Add("~/Scripts/jquery.dragsort-0.5.1.min.js")
             .Add("~/Scripts/jquery.pulse.min.js")
             .Add("~/Scripts/jquery.KeyTips.js")
-            .Add("~/Scripts/jquery.signalR-2.1.0-pre-140513-b35.js")
-            //.Add("~/Scripts/jquery.signalR-2.1.0-pre-140513-b35.min.js")
+            //.Add("~/Scripts/jquery.signalR-2.1.0-pre-140513-b35.js")
+            .Add("~/Scripts/jquery.signalR-2.1.0-pre-140513-b35.min.js")
             .Add("~/Scripts/jquery-ui-1.10.3.custom.min.js")
-            .Render("~/Scripts/JabbR1_#.js"));
+            .Render("~/Scripts/collara1_#.js"));
     }
     <script type="text/javascript" src="@Url.Content("~/signalr/hubs")"></script>
     <script type="text/javascript">
@@ -404,7 +404,7 @@
             .Add("~/Chat.js")
             .Add("~/loader.js")
             .Add("~/JabbrScript.js")
-            .Render("~/Scripts/JabbR2_#.js"));
+            .Render("~/Scripts/collara2_#.js"));
     }
 
     @if (Model.DebugMode)
