@@ -443,15 +443,16 @@
     <Content Include="Content\Theme2\landing\img\avatar9.jpg" />
     <Content Include="Content\Theme2\landing\img\avatar_all.png" />
     <Content Include="Content\Theme2\landing\img\chat.png" />
+    <Content Include="Content\Theme2\landing\img\chat_wi.png" />
     <Content Include="Content\Theme2\landing\img\dashboard.png" />
     <Content Include="Content\Theme2\landing\img\docs.png" />
     <Content Include="Content\Theme2\landing\img\doc_edit.png" />
+    <Content Include="Content\Theme2\landing\img\doc_edit_wi.png" />
     <Content Include="Content\Theme2\landing\img\header_bg.png" />
     <Content Include="Content\Theme2\landing\img\header_one.jpg" />
     <Content Include="Content\Theme2\landing\img\header_two.jpg" />
     <Content Include="Content\Theme2\landing\img\hub.png" />
-    <Content Include="Content\Theme2\landing\img\iphone.jpg" />
-    <Content Include="Content\Theme2\landing\img\perspective.png" />
+    <Content Include="Content\Theme2\landing\img\hub_i.png" />
     <Content Include="Content\Theme2\landing\img\shattered.png" />
     <Content Include="Content\Theme2\landing\img\word_map.png" />
     <Content Include="Content\Theme2\landing\js\cbpAnimatedHeader.js" />
@@ -459,6 +460,10 @@
     <Content Include="Content\Theme2\landing\js\inspinia.js" />
     <Content Include="Content\Theme2\landing\js\pace.min.js" />
     <Content Include="Content\Theme2\landing\js\wow.min.js" />
+    <Content Include="Content\themes\default\Chat.css.map">
+      <DependentUpon>Chat.css</DependentUpon>
+    </Content>
+    <None Include="Content\themes\default\Chat.less" />
     <Content Include="Content\yukkuri.css" />
     <Content Include="Content\themes\default\Chat.bbcnews.css" />
     <Content Include="Content\themes\default\Chat.css" />
