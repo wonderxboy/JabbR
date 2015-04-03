@@ -1,4 +1,4 @@
-@import url("//fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&amp;lang=en");
+﻿@import url("//fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&amp;lang=en");
 /*
  *
  *   INSPINIA Landing Page - Responsive Admin Theme
@@ -145,11 +145,10 @@ h1 {
   height: 470px;
   width: 100%;
 }
-.header-back.one {
-  background: url('../img/header_one.jpg') 50% 0 no-repeat;
-}
-.header-back.two {
-  background: url('../img/header_two.jpg') 50% 0 no-repeat;
+.header-back.one,
+.header-back.two,
+.header-back.three {
+  background: url('../img/header_bg.png') 50% 0 no-repeat;
 }
 /* CUSTOMIZE THE CAROUSEL
 -------------------------------------------------- */
@@ -229,7 +228,7 @@ h1 {
 .carousel-image {
   position: absolute;
   right: 10px;
-  top: 150px;
+  top: 60px;
 }
 .carousel-indicators {
   padding-right: 60px;
@@ -770,3 +769,4 @@ fieldset[disabled] .btn-primary.active {
 .pace-inactive {
   display: none;
 }
+/*# sourceMappingURL=style.css.map */

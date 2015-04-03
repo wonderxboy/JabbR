@@ -442,11 +442,15 @@
     <Content Include="Content\Theme2\landing\img\avatar8.jpg" />
     <Content Include="Content\Theme2\landing\img\avatar9.jpg" />
     <Content Include="Content\Theme2\landing\img\avatar_all.png" />
+    <Content Include="Content\Theme2\landing\img\chat.png" />
     <Content Include="Content\Theme2\landing\img\dashboard.png" />
+    <Content Include="Content\Theme2\landing\img\docs.png" />
+    <Content Include="Content\Theme2\landing\img\doc_edit.png" />
+    <Content Include="Content\Theme2\landing\img\header_bg.png" />
     <Content Include="Content\Theme2\landing\img\header_one.jpg" />
     <Content Include="Content\Theme2\landing\img\header_two.jpg" />
+    <Content Include="Content\Theme2\landing\img\hub.png" />
     <Content Include="Content\Theme2\landing\img\iphone.jpg" />
-    <Content Include="Content\Theme2\landing\img\laptop.png" />
     <Content Include="Content\Theme2\landing\img\perspective.png" />
     <Content Include="Content\Theme2\landing\img\shattered.png" />
     <Content Include="Content\Theme2\landing\img\word_map.png" />
@@ -1167,6 +1171,9 @@
     <Content Include="Content\Theme2\fonts\glyphicons-halflings-regular.eot" />
     <Content Include="Content\Theme2\fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="Content\Theme2\fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="Content\Theme2\landing\css\style.css.map">
+      <DependentUpon>style.css</DependentUpon>
+    </Content>
     <None Include="Properties\PublishProfiles\colla.pubxml" />
     <None Include="Properties\PublishProfiles\TL2.pubxml" />
     <None Include="Scripts\jquery-2.0.3.intellisense.js" />
