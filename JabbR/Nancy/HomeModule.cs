@@ -23,6 +23,25 @@ namespace JabbR.Nancy
         {
             Get["/"] = _ =>
             {
+
+                var viewModel = new SettingsViewModel
+                {
+                    GoogleAnalytics = settings.GoogleAnalytics,
+                    Sha = configuration.DeploymentSha,
+                    Branch = configuration.DeploymentBranch,
+                    Time = configuration.DeploymentTime,
+                    DebugMode = (bool)Context.Items["_debugMode"],
+                    Version = Constants.JabbRVersion,
+                    IsAdmin = Principal.HasClaim(JabbRClaimTypes.Admin),
+                    ClientLanguageResources = BuildClientResources(),
+                    MaxMessageLength = settings.MaxMessageLength
+                };
+
+                return View["landing", viewModel];
+            };
+
+            Get["/hub/"] = _ =>
+            {
                 if (IsAuthenticated)
                 {
                     var viewModel = new SettingsViewModel
@@ -49,8 +68,9 @@ namespace JabbR.Nancy
 
                 if (Principal != null && Principal.HasPartialIdentity())
                 {
+                    return Response.AsRedirect("~/landing");
                     // If the user is partially authenticated then take them to the register page
-                    return Response.AsRedirect("~/account/register");
+                    //return Response.AsRedirect("~/account/register");
                 }
 
                 return HttpStatusCode.Unauthorized;

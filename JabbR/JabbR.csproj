@@ -430,6 +430,31 @@
     <Content Include="Content\Theme2\Content\plugins\toastr\toastr.min.css" />
     <Content Include="Content\Theme2\Content\style.css" />
     <Content Include="Content\Theme2\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="Content\Theme2\landing\css\style.css" />
+    <Content Include="Content\Theme2\landing\css\style.less" />
+    <Content Include="Content\Theme2\landing\img\avatar1.jpg" />
+    <Content Include="Content\Theme2\landing\img\avatar2.jpg" />
+    <Content Include="Content\Theme2\landing\img\avatar3.jpg" />
+    <Content Include="Content\Theme2\landing\img\avatar4.jpg" />
+    <Content Include="Content\Theme2\landing\img\avatar5.jpg" />
+    <Content Include="Content\Theme2\landing\img\avatar6.jpg" />
+    <Content Include="Content\Theme2\landing\img\avatar7.jpg" />
+    <Content Include="Content\Theme2\landing\img\avatar8.jpg" />
+    <Content Include="Content\Theme2\landing\img\avatar9.jpg" />
+    <Content Include="Content\Theme2\landing\img\avatar_all.png" />
+    <Content Include="Content\Theme2\landing\img\dashboard.png" />
+    <Content Include="Content\Theme2\landing\img\header_one.jpg" />
+    <Content Include="Content\Theme2\landing\img\header_two.jpg" />
+    <Content Include="Content\Theme2\landing\img\iphone.jpg" />
+    <Content Include="Content\Theme2\landing\img\laptop.png" />
+    <Content Include="Content\Theme2\landing\img\perspective.png" />
+    <Content Include="Content\Theme2\landing\img\shattered.png" />
+    <Content Include="Content\Theme2\landing\img\word_map.png" />
+    <Content Include="Content\Theme2\landing\js\cbpAnimatedHeader.js" />
+    <Content Include="Content\Theme2\landing\js\classie.js" />
+    <Content Include="Content\Theme2\landing\js\inspinia.js" />
+    <Content Include="Content\Theme2\landing\js\pace.min.js" />
+    <Content Include="Content\Theme2\landing\js\wow.min.js" />
     <Content Include="Content\yukkuri.css" />
     <Content Include="Content\themes\default\Chat.bbcnews.css" />
     <Content Include="Content\themes\default\Chat.css" />
@@ -1188,6 +1213,9 @@
     <Content Include="Scripts\quicksilver.js" />
     <Content Include="Scripts\qunit.js" />
     <Content Include="Content\themes\default\Chat.dictionary.css" />
+    <Content Include="Views\Home\landing.cshtml">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
