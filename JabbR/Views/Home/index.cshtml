@@ -2,7 +2,7 @@
 @using SquishIt.Framework;
 @model SettingsViewModel
 @{
-    var curretModel =  Model;
+    var currentModel =  Model;
 }
 <!DOCTYPE html>
 <html>
@@ -33,20 +33,8 @@
             .Render("~/Content/JabbR_#.css"));
    }
 
-    @if (!String.IsNullOrEmpty(Model.GoogleAnalytics))
-    {
-    <script type="text/javascript">
-        var _gaq = _gaq || [];
-        _gaq.push(['_setAccount', '@Model.GoogleAnalytics']);
-        _gaq.push(['_trackPageview']);
+   @Html.Partial("_tracking", @currentModel)
 
-        (function () {
-          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-        })();
-    </script>
-    }
     <script id="new-message-template" type="text/x-jquery-tmpl">
         <li class="message ${highlight} ${greentext} clearfix{{if isMine}} my-message{{/if}}{{if showUser}} first{{/if}}{{if clearscreen}} clearscreen{{/if}}" id="m-${id}" data-name="${name}" data-timestamp="${date}">
             <div class="left">
@@ -303,7 +291,7 @@
 <body class="home@(Model.IsAdmin ? " home-admin" : "")">
     <section id="page" role="application">
 
-        @Html.Partial("_topmenu", @curretModel)
+        @Html.Partial("_topmenu", @currentModel)
 
         <div id="chat-area" role="tabpanel">
             <form id="room-filter-form" action="#" class="form-inline">
@@ -360,7 +348,7 @@
             </div>
         </form>
 
-        @Html.Partial("_dialog", @curretModel)
+        @Html.Partial("_dialog", @currentModel)
 
         <audio src="Content/sounds/notification.wav" id="notificationSound" hidden="hidden" aria-hidden="true">
         </audio>

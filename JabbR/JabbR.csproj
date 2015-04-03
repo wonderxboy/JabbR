@@ -444,7 +444,6 @@
     <Content Include="Content\Theme2\landing\img\avatar_all.png" />
     <Content Include="Content\Theme2\landing\img\chat.png" />
     <Content Include="Content\Theme2\landing\img\chat_wi.png" />
-    <Content Include="Content\Theme2\landing\img\dashboard.png" />
     <Content Include="Content\Theme2\landing\img\docs.png" />
     <Content Include="Content\Theme2\landing\img\doc_edit.png" />
     <Content Include="Content\Theme2\landing\img\doc_edit_wi.png" />
@@ -1260,6 +1259,7 @@
     <Content Include="Views\Home\_dialog.cshtml" />
     <Content Include="Views\Home\_topmenu.cshtml" />
     <Content Include="Views\Account\_layoutTheme2.cshtml" />
+    <Content Include="Views\Home\_tracking.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Auth\DataProtectorSingleton.cs" />
@@ -1692,7 +1692,9 @@
   <ItemGroup>
     <Content Include="Chat.emoji.js" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Views\Shared\" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
