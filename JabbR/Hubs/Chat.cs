@@ -715,6 +715,66 @@ namespace JabbR
             OnRoomChanged(room);
         }
 
+        private void OnRoomChanged(ChatRoom room)
+        {
+            var roomViewModel = new RoomViewModel
+            {
+                Name = room.Name,
+                Private = room.Private,
+                Closed = room.Closed,
+                Topic = room.Topic ?? String.Empty,
+                Count = _repository.GetOnlineUsers(room).Count()
+            };
+
+            // notify all clients who can see the room
+            if (!room.Private)
+            {
+                Clients.All.updateRoom(roomViewModel);
+            }
+            else
+            {
+                Clients.Clients(_repository.GetAllowedClientIds(room)).updateRoom(roomViewModel);
+            }
+        }
+
+        private ClientState GetClientState()
+        {
+            // New client state
+            var jabbrState = GetCookieValue("jabbr.state");
+
+            ClientState clientState = null;
+
+            if (String.IsNullOrEmpty(jabbrState))
+            {
+                clientState = new ClientState();
+            }
+            else
+            {
+                clientState = JsonConvert.DeserializeObject<ClientState>(jabbrState);
+            }
+
+            return clientState;
+        }
+
+        private string GetCookieValue(string key)
+        {
+            Cookie cookie;
+            Context.RequestCookies.TryGetValue(key, out cookie);
+            string value = cookie != null ? cookie.Value : null;
+            return value != null ? Uri.UnescapeDataString(value) : null;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _repository.Dispose();
+            }
+
+            base.Dispose(disposing);
+        }
+
+        #region Client Methods
         void INotificationService.LogOn(ChatUser user, string clientId)
         {
             LogOn(user, clientId, reconnecting: true);
@@ -1133,55 +1193,6 @@ namespace JabbR
             Clients.All.forceUpdate();
         }
 
-        private void OnRoomChanged(ChatRoom room)
-        {
-            var roomViewModel = new RoomViewModel
-            {
-                Name = room.Name,
-                Private = room.Private,
-                Closed = room.Closed,
-                Topic = room.Topic ?? String.Empty,
-                Count = _repository.GetOnlineUsers(room).Count()
-            };
-
-            // notify all clients who can see the room
-            if (!room.Private)
-            {
-                Clients.All.updateRoom(roomViewModel);
-            }
-            else
-            {
-                Clients.Clients(_repository.GetAllowedClientIds(room)).updateRoom(roomViewModel);
-            }
-        }
-
-        private ClientState GetClientState()
-        {
-            // New client state
-            var jabbrState = GetCookieValue("jabbr.state");
-
-            ClientState clientState = null;
-
-            if (String.IsNullOrEmpty(jabbrState))
-            {
-                clientState = new ClientState();
-            }
-            else
-            {
-                clientState = JsonConvert.DeserializeObject<ClientState>(jabbrState);
-            }
-
-            return clientState;
-        }
-
-        private string GetCookieValue(string key)
-        {
-            Cookie cookie;
-            Context.RequestCookies.TryGetValue(key, out cookie);
-            string value = cookie != null ? cookie.Value : null;
-            return value != null ? Uri.UnescapeDataString(value) : null;
-        }
-
         void INotificationService.BanUser(ChatUser targetUser)
         {
             var rooms = targetUser.Rooms.Select(x => x.Name);
@@ -1233,14 +1244,6 @@ namespace JabbR
             });
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                _repository.Dispose();
-            }
-
-            base.Dispose(disposing);
-        }
+        #endregion
     }
 }
