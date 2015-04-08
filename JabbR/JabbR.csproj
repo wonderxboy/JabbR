@@ -1307,6 +1307,8 @@
     </Content>
     <Content Include="Views\Home\messages.cshtml" />
     <Content Include="Views\Home\_layout.cshtml" />
+    <Content Include="Views\Home\_layout_full_height.cshtml" />
+    <Content Include="Views\Home\_sidemenu.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Auth\DataProtectorSingleton.cs" />

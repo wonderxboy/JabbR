@@ -1,6 +1,4 @@
 ﻿@using JabbR;
-@using SquishIt.Framework
-
 @{
     var title = string.Empty;
     if (ViewBag.Title == null || string.IsNullOrEmpty(ViewBag.Title))
@@ -19,24 +17,28 @@
 <head>
     <meta charset="UTF-8" />
     <title>@title</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
     <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
     <link href="//cdnjs.cloudflare.com/ajax/libs/animate.css/3.2.6/animate.min.css" rel="stylesheet">
+    <link href="~/Content/themes/greengem/css/plugins/codemirror/codemirror.css" rel="stylesheet">
+    <link href="~/Content/themes/greengem/css/plugins/codemirror/ambiance.css" rel="stylesheet">
     <link href="~/Content/themes/greengem/css/style.css" rel="stylesheet" />
-
-    @*@Html.Partial("_tracking", @currentModel)*@
+    @RenderSection("css", false)
+    @RenderSection("tracking", false)
+    @RenderSection("template", false)
 </head>
 
-<body>
+<body class="fixed-sidebar no-skin-config full-height-layout">
 
     <div id="wrapper">
 
-       @Html.Partial("_sidemenu")
+        @Html.Partial("_sidemenu")
 
         <div id="page-wrapper" class="gray-bg">
             <div class="row border-bottom">
-                <nav class="navbar navbar-static-top white-bg" role="navigation" style="margin-bottom: 0">
+                <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
                     <div class="navbar-header">
                         <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
                         <form role="search" class="navbar-form-custom" action="search_results.html">
@@ -155,24 +157,36 @@
 
                 </nav>
             </div>
-
-            <div class="wrapper wrapper-content">
-                @RenderBody()
-            </div>
+           
+            @RenderBody()
 
             <div class="footer">
-                    <div class="pull-right">
-                        10GB of <strong>250GB</strong> Free.
+                <form id="send-message" action="#">
+                    <div class="row">
+                        <div class="col-md-10">
+                            <div id="message-box">
+                                <textarea id="new-message" autocomplete="off" aria-autocomplete="none" accesskey="m" @Html.Raw(Model.MaxMessageLength > 0 ? "maxlength=\"" + Model.MaxMessageLength + "\"" : "")></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="submit" id="send" value="@LanguageResources.Client_Send" class="send btn" />
+                        </div>
                     </div>
-                    <div>
-                        <strong>Copyright</strong> Example Company &copy; 2014-2015
+                </form>
+                    <div class="hidden">
+                        <form id="upload" action="@Url.Content("~/upload-file")" method="post" enctype="multipart/form-data" target="upload-frame">
+                            <input type="hidden" id="file-connection-id" name="connectionId" />
+                            <input type="hidden" id="file-message-id" name="messageId" />
+                            <input type="hidden" id="file-room" name="room" />
+                            <div class="btn upload-button icon-cloud-upload icon-large">
+                                <input type="file" id="hidden-file" name="data">
+                            </div>
+                        </form>
                     </div>
-                </div>
-
             </div>
+
+        </div>
     </div>
-
-
 
     <!-- Mainly scripts -->
 
@@ -186,12 +200,8 @@
     <script src="~/Content/themes/greengem/js/site.js"></script>
     <script src="~/Content/themes/greengem/js/plugins/pace/pace.min.js"></script>
 
-    <!-- Peity -->
-    @*<script src="js/plugins/peity/jquery.peity.min.js"></script>*@
 
-    <!-- Peity -->
-    @*<script src="js/demo/peity-demo.js"></script>*@
-
+    @RenderSection("script", false)
 </body>
 
 </html>
