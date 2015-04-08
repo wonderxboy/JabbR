@@ -63,7 +63,7 @@ namespace JabbR.Nancy
                         this.ViewBag.Username =user.Name;
                     }
 
-                    return View["index", viewModel];
+                    return View["messages", viewModel];
                 }
 
                 if (Principal != null && Principal.HasPartialIdentity())

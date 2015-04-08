@@ -463,6 +463,12 @@
       <DependentUpon>Chat.css</DependentUpon>
     </Content>
     <None Include="Content\themes\default\Chat.less" />
+    <Content Include="Content\themes\greengem\css\style.css" />
+    <Content Include="Content\themes\greengem\js\plugins\metisMenu\jquery.metisMenu.js" />
+    <Content Include="Content\themes\greengem\js\plugins\pace\pace.min.js" />
+    <Content Include="Content\themes\greengem\js\plugins\slimscroll\jquery.slimscroll.js" />
+    <Content Include="Content\themes\greengem\js\plugins\slimscroll\jquery.slimscroll.min.js" />
+    <Content Include="Content\themes\greengem\js\site.js" />
     <Content Include="Content\yukkuri.css" />
     <Content Include="Content\themes\default\Chat.bbcnews.css" />
     <Content Include="Content\themes\default\Chat.css" />
@@ -1180,6 +1186,9 @@
     </Content>
     <None Include="Properties\PublishProfiles\colla.pubxml" />
     <None Include="Properties\PublishProfiles\TL2.pubxml" />
+    <Content Include="Scripts\bootstrap.min.js.map">
+      <DependentUpon>bootstrap.min.js</DependentUpon>
+    </Content>
     <None Include="Scripts\jquery-2.0.3.intellisense.js" />
     <Content Include="Scripts\jquery.etherpad.js" />
     <Content Include="Scripts\jquery-2.0.3.js" />
@@ -1260,6 +1269,44 @@
     <Content Include="Views\Home\_topmenu.cshtml" />
     <Content Include="Views\Account\_layoutTheme2.cshtml" />
     <Content Include="Views\Home\_tracking.cshtml" />
+    <Content Include="Scripts\jquery-ui-1.10.3.custom.min.js.map">
+      <DependentUpon>jquery-ui-1.10.3.custom.min.js</DependentUpon>
+    </Content>
+    <Content Include="Scripts\jquery.signalR-2.1.0-pre-140513-b35.min.js.map">
+      <DependentUpon>jquery.signalR-2.1.0-pre-140513-b35.min.js</DependentUpon>
+    </Content>
+    <Content Include="Scripts\jQuery.tmpl.min.js.map">
+      <DependentUpon>jQuery.tmpl.min.js</DependentUpon>
+    </Content>
+    <Content Include="Scripts\jquery-2.0.3.min.js.map">
+      <DependentUpon>jquery-2.0.3.min.js</DependentUpon>
+    </Content>
+    <Content Include="Scripts\jquery-migrate-1.2.1.min.js.map">
+      <DependentUpon>jquery-migrate-1.2.1.min.js</DependentUpon>
+    </Content>
+    <Content Include="Scripts\jquery.captureDocumentWrite.min.js.map">
+      <DependentUpon>jquery.captureDocumentWrite.min.js</DependentUpon>
+    </Content>
+    <Content Include="Scripts\jquery.color-2.1.2.min.js.map">
+      <DependentUpon>jquery.color-2.1.2.min.js</DependentUpon>
+    </Content>
+    <Content Include="Scripts\jquery.dragsort-0.5.1.min.js.map">
+      <DependentUpon>jquery.dragsort-0.5.1.min.js</DependentUpon>
+    </Content>
+    <Content Include="Scripts\jquery.KeyTips.min.js.map">
+      <DependentUpon>jquery.KeyTips.min.js</DependentUpon>
+    </Content>
+    <Content Include="Scripts\jquery.pulse.min.js.map">
+      <DependentUpon>jquery.pulse.min.js</DependentUpon>
+    </Content>
+    <Content Include="Scripts\json2.min.js.map">
+      <DependentUpon>json2.min.js</DependentUpon>
+    </Content>
+    <Content Include="Scripts\livestamp.min.js.map">
+      <DependentUpon>livestamp.min.js</DependentUpon>
+    </Content>
+    <Content Include="Views\Home\messages.cshtml" />
+    <Content Include="Views\Home\_layout.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Auth\DataProtectorSingleton.cs" />
